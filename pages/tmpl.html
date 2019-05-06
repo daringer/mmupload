@@ -1,0 +1,82 @@
+<!doctype html>
+<head lang=en>
+<meta charset="UTF-8" />
+<title>Fancy Uploader Frontend</title>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<style type="text/css">
+
+body {
+	background-color: grey;
+}
+
+.left {
+	float: left;
+	width: 200px;
+}
+
+a:active, a:link, a:visited {
+	color: #330;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+</style>
+
+</head>
+<body>
+
+{% if show_upload %}
+<form method=POST enctype=multipart/form-data action="{{ url_for("upload") }}">
+	<div class=left>category:</div>
+	<div class=right>
+		<select name=cat_id>{% for cat_id in categories %}
+		<option value="{{ cat_id }}" {{ "selected " if cat_active == cat_id else "" }}>{{ cat_id }}</option>
+		{% endfor %}</select>
+	</div><br />
+
+	<div class=left>upload:</div>
+	<div class=right><input type=file name=target /></div>
+	<div class=right><input type=submit value=upload /></div><br />
+</form>
+<hr />
+{% endif %}
+
+{% if show_categories %}
+	{% for cat_id  in categories %}
+		<div class=left>{{ cat_id }}</div>
+		<div class=right>
+			<a href="{{ url_for("cat_del", cat_id=cat_id) }}">delete</a>
+			<a href="{{ url_for("cat_show", cat_id=cat_id) }}">show</a>
+		</div>
+	{% endfor %}<br />
+<form method=POST action="{{ url_for("cat_new") }}">
+	<div class=left>new category:</div>
+	<div class=left><input type=text name=new_cat_name /></div>
+	<div class=right><input type=submit value=add /></div>
+</form>
+<hr />
+{% endif %}
+
+{% if show_files %}
+<ul>
+{% for file_id in files %}
+<li class=file_item>
+	<a href={{ url_for("get_file", cat_id=cat_id, file_id=file_id) }}>{{ file_id }}</a>
+</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+</body>
