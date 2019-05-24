@@ -18,6 +18,7 @@ class FileDBError(Exception): pass
 class InvalidName(FileDBError): pass
 class DirAlreadyExists(FileDBError): pass
 class DirNotExisting(FileDBError): pass
+class FileNotExisting(FileDBError): pass
 class DirNotEmpty(FileDBError): pass
 class NotDeletingRootDir(FileDBError): pass
 class NotAFileError(FileDBError): pass
@@ -32,8 +33,6 @@ class FileDB:
         self.rel_dir = rel_dir
         self.base_dir = root_dir
 
-        self.upload_sets_map = {}
-
     def get_contents(self, dirname=""):
         return os.listdir(os.path.join(self.base_dir, dirname))
 
@@ -46,7 +45,6 @@ class FileDB:
                 if self.isfile(os.path.join(dirname, p))]
 
     def get_path(self, rel_path):
-        print (os.path.join(self.base_dir, rel_path))
         return os.path.join(self.base_dir, rel_path)
 
     def isdir(self, rel_path):
@@ -63,23 +61,14 @@ class FileDB:
         return os.makedirs(self.get_path(os.path.join(dirname, new_dir)))
 
     def create_file(self, dirname, data):
-        """ gwpokgpwrgkprowpgoropkwgpo
-        poqrkgfwqpfekoqfe
-        feopfeqwpefoqwkpofeq
-        """
-
-        print (self.base_dir)
-        print (dir(data))
         path = self.get_path(os.path.join(dirname, data.filename))
         data.save(path)
         return path
 
-
-        #data is more complex!
-        #print (data, dir(data))
-        #with open(data, "w") as fd:
-        #    fd.write(data)
-        #return self.upload_set.save(data)
+    def delete_file(self, path):
+        if not self.isfile(path):
+            raise FileNotExisting(path)
+        return os.unlink(self.get_path(path))
 
     def delete_dir(self, dirname):
         if not self.isdir(dirname):
@@ -88,8 +77,6 @@ class FileDB:
             raise DirNotEmpty(self.get_path(dirname))
         if os.path.abspath(self.root_dir) == os.path.abspath(self.get_path(dirname)):
             raise NotDeletingRootDir()
-        if self.get_path(dirname) in self.upload_sets_map:
-            del self.upload_sets_map[self.get_path(dirname)]
         return os.rmdir(self.get_path(dirname))
 
     def get_file(self, rel_path):
@@ -112,18 +99,14 @@ cfg = yaml.load(open(config_path))
 
 app = Flask(__name__)
 app.secret_key = cfg["secret_key"]
-#app.config["UPLOADS_DEFAULT_DEST"] = cfg["file_destination"]
 
-#app.config["UPLOADS_my_DEST"] = cfg["file_destination"]
 app.register_blueprint(main, url_prefix="/")
 
 filedb = FileDB(cfg["file_destination"], "")
-#configure_uploads(app, (filedb.upload_set, ))
 
 
 @app.route("/up/<path:dirname>", methods=["POST"])
 def upload(dirname):
-    #dirname = request.form["dirname"]
 
     if not "target" in request.files:
       flash(repr(NotAFileError()))
@@ -168,10 +151,20 @@ def create_dir(dirname):
 def delete_dir(dirname):
     try:
         filedb.delete_dir(dirname)
-        flash(f"deleted category: {dirname}")
+        flash(f"deleted directory: {dirname}")
     except FileDBError as e:
       flash(repr(e))
     return redirect(url_for("show", dirname=os.path.dirname(dirname)))
+
+@app.route("/del_file/<path:target>", methods=["GET"])
+def delete_file(target):
+    try:
+        filedb.delete_file(target)
+        flash(f"deleted file: {target}")
+    except FileDBError as e:
+      flash(repr(e))
+    return redirect(url_for("show", dirname=os.path.dirname(target)))
+
 
 @app.route("/get/<path:target>", methods=["GET"])
 def get_file(target):

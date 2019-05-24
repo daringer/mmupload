@@ -20,9 +20,11 @@ body {
 
 .left {
 	float: left;
-	width: 200px;
+	width: 400px;
 }
 
+.right {
+}
 a:active, a:link, a:visited {
 	color: #330;
 	text-decoration: none;
@@ -70,7 +72,8 @@ a:hover {
 <ul>
 {% for target, path in files %}
 <li class=file_item>
-	<a href={{ url_for("get_file", target=path ) }}>{{ target }}</a>
+<a class=left href={{ url_for("get_file", target=path ) }}>{{ target }}</a>
+<a class=right href={{ url_for("delete_file", target=path) }}>delete</a>
 </li>
 {% endfor %}
 </ul>
