@@ -12,83 +12,8 @@ main = Blueprint("main", __name__, template_folder="pages")
 from urllib.parse import quote, urlparse
 
 import yaml
-import re
 
-class FileDBError(Exception): pass
-class InvalidName(FileDBError): pass
-class DirAlreadyExists(FileDBError): pass
-class DirNotExisting(FileDBError): pass
-class FileNotExisting(FileDBError): pass
-class DirNotEmpty(FileDBError): pass
-class NotDeletingRootDir(FileDBError): pass
-class NotAFileError(FileDBError): pass
-
-class FileDB:
-
-    raw_name_pat = "^[a-zA-Z0-9-_/]+$"
-    name_pat = re.compile(raw_name_pat)
-
-    def __init__(self, root_dir, rel_dir=""):
-        self.root_dir = root_dir
-        self.rel_dir = rel_dir
-        self.base_dir = root_dir
-
-    def get_contents(self, dirname=""):
-        if dirname != "":
-            if not self.name_pat.match(dirname):
-                raise InvalidName(f"{dirname} (need: {self.raw_name_pat})")
-            if not self.isdir(dirname):
-                raise DirNotExisting(dirname)
-        return os.listdir(os.path.join(self.base_dir, dirname))
-
-    def get_dirs(self, dirname):
-        return [p for p in self.get_contents(dirname)
-                if self.isdir(os.path.join(dirname, p))]
-
-    def get_files(self, dirname):
-        return [p for p in self.get_contents(dirname)
-                if self.isfile(os.path.join(dirname, p))]
-
-    def get_path(self, rel_path):
-        return os.path.join(self.base_dir, rel_path)
-
-    def isdir(self, rel_path):
-        return os.path.isdir(self.get_path(rel_path))
-
-    def isfile(self, rel_path):
-        return os.path.isfile(self.get_path(rel_path))
-
-    def create_dir(self, dirname, new_dir):
-        if not self.name_pat.match(new_dir):
-            raise InvalidName(f"{name} (need: {self.raw_name_pat})")
-        if new_dir in self.get_dirs(dirname):
-            raise DirAlreadyExists(new_dir)
-        return os.makedirs(self.get_path(os.path.join(dirname, new_dir)))
-
-    def create_file(self, dirname, data):
-        path = self.get_path(os.path.join(dirname, data.filename))
-        data.save(path)
-        return path
-
-    def delete_file(self, path):
-        if not self.isfile(path):
-            raise FileNotExisting(path)
-        return os.unlink(self.get_path(path))
-
-    def delete_dir(self, dirname):
-        if not self.isdir(dirname):
-            raise DirNotExisting(dirname)
-        if len(self.get_contents(dirname)) > 0:
-            raise DirNotEmpty(self.get_path(dirname))
-        if os.path.abspath(self.root_dir) == os.path.abspath(self.get_path(dirname)):
-            raise NotDeletingRootDir()
-        return os.rmdir(self.get_path(dirname))
-
-    def get_file(self, rel_path):
-        path = self.get_path(rel_path)
-        if not self.isfile(rel_path):
-          raise NotAFileError(path)
-        return open(path).read()
+from file_db import FileDB, FileDBError
 
 # determine config file path
 config_path = f"/srv/flask/{os.getlogin()}/mmupload/mmupload.yaml"
@@ -110,17 +35,22 @@ app.register_blueprint(main, url_prefix="/")
 filedb = FileDB(cfg["file_destination"], "")
 
 
-@app.route("/up/<path:dirname>", methods=["POST"])
-def upload(dirname):
-
-    if not "target" in request.files:
-      flash(repr(NotAFileError()))
-      return redirect(url_for("show", dirname=dirname))
-
-    app.config["UPLOADS_FILES_DEST"] = filedb.get_path(dirname)
-
-    filename = filedb.create_file(dirname, request.files["target"])
-    flash(f"Saved to: {filename}")
+@app.route("/new/", methods=["POST"])
+@app.route("/new/<path:dirname>", methods=["POST"])
+def create(dirname=""):
+    try:
+        if "new_dirname" in request.form:
+            new_dirname = request.form.get("new_dirname")
+            filedb.create_dir(dirname, new_dirname)
+            flash(f"directory created: {new_dirname}")
+        elif "target" in request.files:
+            app.config["UPLOADS_FILES_DEST"] = filedb.get_path(dirname)
+            filename = filedb.create_file(dirname, request.files["target"])
+            flash(f"Saved to: {filename}")
+        else:
+            flash("invalid request")
+    except FileDBError as e:
+        flash(repr(e))
     return redirect(url_for("show", dirname=dirname))
 
 @app.route("/")
@@ -140,42 +70,30 @@ def show(dirname=""):
         base_dir_name=os.path.basename(dirname if dirname != "" else ".")
     )
 
-@app.route("/new_dir/", methods=["POST"])
-@app.route("/new_dir/<path:dirname>", methods=["POST"])
-def create_dir(dirname=""):
-
-    if not "new_dirname" in request.form:
-        flash("new dirname not provided")
-        return redirect("/")
-
-    new_dirname = request.form.get("new_dirname")
-    filedb.create_dir(dirname, new_dirname)
-    flash(f"directory created: {new_dirname}")
-    return redirect(url_for("show", dirname=dirname))
-
-@app.route("/del_dir/<path:dirname>", methods=["GET"])
-def delete_dir(dirname):
+@app.route("/del/<path:target>", methods=["GET"])
+def delete(target):
     try:
-        filedb.delete_dir(dirname)
-        flash(f"deleted directory: {dirname}")
+        if filedb.isdir(target):
+            filedb.delete_dir(target)
+            flash(f"deleted dir: {target}")
+        elif filedb.isfile(target):
+            filedb.delete_file(target)
+            flash(f"deleted file: {target}")
+        else:
+            raise ValueError(target)
     except FileDBError as e:
-      flash(repr(e))
-    return redirect(url_for("show", dirname=os.path.dirname(dirname)))
-
-@app.route("/del_file/<path:target>", methods=["GET"])
-def delete_file(target):
-    try:
-        filedb.delete_file(target)
-        flash(f"deleted file: {target}")
-    except FileDBError as e:
-      flash(repr(e))
+        flash(repr(e))
     return redirect(url_for("show", dirname=os.path.dirname(target)))
 
 
 @app.route("/get/<path:target>", methods=["GET"])
 def get_file(target):
-    content = filedb.get_file(target)
-    return Response(content, mimetype="octet/stream")
+    try:
+      content = filedb.get_file(target)
+      return Response(content, mimetype="octet/stream")
+    except FileDBError as e:
+      flash(repr(e))
+      return redirect(url_for("show", dirname=os.path.dirname(target)))
 
 
 #@app.route("/get/<file_id>", methods=["GET"])
