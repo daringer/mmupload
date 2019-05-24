@@ -25,7 +25,7 @@ class NotAFileError(FileDBError): pass
 
 class FileDB:
 
-    raw_name_pat = "^[a-zA-Z0-9-_]+$"
+    raw_name_pat = "^[a-zA-Z0-9-_/]+$"
     name_pat = re.compile(raw_name_pat)
 
     def __init__(self, root_dir, rel_dir=""):
@@ -34,6 +34,11 @@ class FileDB:
         self.base_dir = root_dir
 
     def get_contents(self, dirname=""):
+        if dirname != "":
+            if not self.name_pat.match(dirname):
+                raise InvalidName(f"{dirname} (need: {self.raw_name_pat})")
+            if not self.isdir(dirname):
+                raise DirNotExisting(dirname)
         return os.listdir(os.path.join(self.base_dir, dirname))
 
     def get_dirs(self, dirname):
@@ -127,16 +132,17 @@ def show(dirname=""):
     parent = os.path.dirname(dirname)
     return render_template("tmpl.html",
         show_dirs=True, show_upload=True if dirname != "" else False, show_files=True,
-        dirs=map(lambda d: (d, os.path.join(dirname, d)), filedb.get_dirs(dirname)),
-        files=map(lambda f: (f, os.path.join(dirname, f)), filedb.get_files(dirname)),
+        dirs=sorted(map(lambda d: (d, os.path.join(dirname, d)), filedb.get_dirs(dirname))),
+        files=sorted(map(lambda f: (f, os.path.join(dirname, f)), filedb.get_files(dirname))),
         parent_dir="" if dirname == "" else os.path.basename(parent),
         parent_path="" if dirname == "" else parent,
         base_dir=dirname if dirname != "" else ".",
         base_dir_name=os.path.basename(dirname if dirname != "" else ".")
     )
 
+@app.route("/new_dir/", methods=["POST"])
 @app.route("/new_dir/<path:dirname>", methods=["POST"])
-def create_dir(dirname):
+def create_dir(dirname=""):
 
     if not "new_dirname" in request.form:
         flash("new dirname not provided")
