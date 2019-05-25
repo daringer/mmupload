@@ -39,7 +39,7 @@ class FileDB:
                 if self.isfile(os.path.join(dirname, p))]
 
     def get_path(self, rel_path):
-        if rel_path.startswith("/"):
+        if rel_path.startswith("/") or ".." in rel_path:
             raise InvalidPath(rel_path)
         return os.path.join(self.root_dir, rel_path)
 
