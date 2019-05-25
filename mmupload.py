@@ -1,13 +1,16 @@
 import sys
 import os
+from functools import wraps
+
+import hashlib
+
 
 from flask import Flask, render_template, request, flash, redirect, Response, url_for
+from flask import Blueprint, render_template
+
 from werkzeug import secure_filename
 
-from flask import Blueprint, render_template
 main = Blueprint("main", __name__, template_folder="pages")
-
-#from flask_uploads import UploadSet, configure_uploads, ALL
 
 from urllib.parse import quote, urlparse
 
@@ -32,11 +35,37 @@ app.secret_key = cfg["secret_key"]
 
 app.register_blueprint(main, url_prefix="/")
 
-filedb = FileDB(cfg["file_destination"], "")
+filedb = FileDB(cfg["file_destination"])
 
+
+def make_pass(pwd):
+    return hashlib.sha256(pwd.encode("utf-8") + b"//SALT//" +
+                          app.secret_key.encode("utf-8")).hexdigest()
+
+def check_auth_global(username, password):
+    print(make_pass(password))
+    return username == cfg["user"] and cfg["pwd"] == make_pass(password)
+
+def check_auth_shared(share, username, password):
+    return username == cfg["user"] and cfg["pwd"] == make_pass(password)
+
+def http_authenticate():
+    return Response("No access!", 401, {
+      "WWW-Authenticate": 'Basic realm="Login Required"'}
+    )
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth_global(auth.username, auth.password):
+            return http_authenticate()
+        return f(*args, **kwargs)
+    return decorated
 
 @app.route("/new/", methods=["POST"])
 @app.route("/new/<path:dirname>", methods=["POST"])
+@requires_auth
 def create(dirname=""):
     try:
         if "new_dirname" in request.form:
@@ -56,6 +85,7 @@ def create(dirname=""):
 @app.route("/")
 @app.route("/dir/")
 @app.route("/dir/<path:dirname>")
+@requires_auth
 def show(dirname=""):
     #print (filedb.get_dirs(dirname))
     #print (filedb.get_files(dirname))
@@ -71,6 +101,7 @@ def show(dirname=""):
     )
 
 @app.route("/del/<path:target>", methods=["GET"])
+@requires_auth
 def delete(target):
     try:
         if filedb.isdir(target):
@@ -87,6 +118,7 @@ def delete(target):
 
 
 @app.route("/get/<path:target>", methods=["GET"])
+@requires_auth
 def get_file(target):
     try:
       content = filedb.get_file(target)

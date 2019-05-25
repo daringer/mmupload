@@ -18,10 +18,8 @@ class FileDB:
     raw_name_pat = "^[a-zA-Z0-9-_/]+$"
     name_pat = re.compile(raw_name_pat)
 
-    def __init__(self, root_dir, rel_dir=""):
+    def __init__(self, root_dir):
         self.root_dir = root_dir
-        self.rel_dir = rel_dir
-        self.base_dir = root_dir
 
     def get_contents(self, dirname=""):
         if dirname != "":
@@ -29,7 +27,7 @@ class FileDB:
                 raise InvalidName(f"{dirname} (need: {self.raw_name_pat})")
             if not self.isdir(dirname):
                 raise DirNotExisting(dirname)
-        return os.listdir(os.path.join(self.base_dir, dirname))
+        return os.listdir(os.path.join(self.root_dir, dirname))
 
     def get_dirs(self, dirname):
         return [p for p in self.get_contents(dirname)
@@ -42,7 +40,7 @@ class FileDB:
     def get_path(self, rel_path):
         if rel_path.startswith("/"):
             raise InvalidPath(rel_path)
-        return os.path.join(self.base_dir, rel_path)
+        return os.path.join(self.root_dir, rel_path)
 
     def isdir(self, rel_path):
         return os.path.isdir(self.get_path(rel_path))
