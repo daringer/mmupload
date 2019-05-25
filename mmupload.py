@@ -68,18 +68,19 @@ def requires_auth(f):
 @requires_auth
 def create(dirname=""):
     try:
-        if "new_dirname" in request.form:
+        if request.form.get("what") == "add" and len(request.form.get("new_dirname").strip()) > 0:
             new_dirname = request.form.get("new_dirname")
             filedb.create_dir(dirname, new_dirname)
             flash(f"directory created: {new_dirname}")
-        elif "target" in request.files:
+        elif request.form.get("what") == "upload":
             app.config["UPLOADS_FILES_DEST"] = filedb.get_path(dirname)
             filename = filedb.create_file(dirname, request.files["target"])
             flash(f"Saved to: {filename}")
         else:
             flash("invalid request")
     except FileDBError as e:
-        flash(repr(e))
+        #flash(repr(e))
+        raise e
     return redirect(url_for("show", dirname=dirname))
 
 @app.route("/")

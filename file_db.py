@@ -22,6 +22,7 @@ class FileDB:
         self.root_dir = root_dir
 
     def get_contents(self, dirname=""):
+        print(dirname)
         if dirname != "":
             if not self.name_pat.match(dirname):
                 raise InvalidName(f"{dirname} (need: {self.raw_name_pat})")
@@ -57,9 +58,13 @@ class FileDB:
 
     def create_file(self, dirname, data):
         target = os.path.join(dirname, data.filename)
-        if target in self.get_contents(target):
+        if target in self.get_contents(dirname):
             raise FileAlreadyExists(target)
+
         path = self.get_path(target)
+        if self.isdir(path) or self.isfile(path):
+            raise FileAlreadyExists(target)
+
         data.save(path)
         return path
 

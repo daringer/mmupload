@@ -42,10 +42,9 @@ a:hover {
 
 {% if show_upload %}
 <form method=POST enctype=multipart/form-data action="{{ url_for("create", dirname=base_dir) }}">
-	<!-- input type=hidden name=dirname value="{{ base_dir }}" --!>
 	<div class=left>upload:</div>
-	<div class=right><input type=file name=target /></div>
-	<div class=right><input type=submit value=upload /></div><br />
+	<div class=left><input type=file name=target /></div>
+	<div class=right><input type=submit value=upload name=what /></div><br />
 </form>
 <hr />
 {% endif %}
@@ -64,7 +63,7 @@ a:hover {
 <form method=POST action="{{ url_for("create", dirname=base_dir) }}">
 	<div class=left>new dir:</div>
 	<div class=left><input type=text name=new_dirname /></div>
-	<div class=right><input type=submit value=add /></div>
+	<div class=right><input type=submit value=add name=what /></div>
 </form>
 <hr />
 {% endif %}
