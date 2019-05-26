@@ -43,7 +43,6 @@ def make_pass(pwd):
                           app.secret_key.encode("utf-8")).hexdigest()
 
 def check_auth_global(username, password):
-    print(make_pass(password))
     return username == cfg["user"] and cfg["pwd"] == make_pass(password)
 
 def check_auth_shared(share, username, password):
@@ -91,8 +90,18 @@ def show(dirname=""):
     #print (filedb.get_dirs(dirname))
     #print (filedb.get_files(dirname))
     parent = os.path.dirname(dirname)
+    css_content = render_template("style.css")
+    print(css_content)
+    cur_path_toks = [("[root]", "")]
+    for tok in dirname.split(os.sep):
+        if tok:
+            cur_path_toks.append((tok, os.path.join(cur_path_toks[-1][1], tok)))
+
     return render_template("tmpl.html",
+        css=css_content,
         show_dirs=True, show_upload=True if dirname != "" else False, show_files=True,
+        show_newdir=True,
+        cur_path_toks=cur_path_toks,
         dirs=sorted(map(lambda d: (d, os.path.join(dirname, d)), filedb.get_dirs(dirname))),
         files=sorted(map(lambda f: (f, os.path.join(dirname, f)), filedb.get_files(dirname))),
         parent_dir="" if dirname == "" else os.path.basename(parent),

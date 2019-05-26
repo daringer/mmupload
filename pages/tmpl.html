@@ -2,81 +2,82 @@
 <head lang=en>
 <meta charset="UTF-8" />
 <title>Fancy Uploader Frontend</title>
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
+
 
 <style type="text/css">
-
-body {
-	background-color: grey;
-}
-
-.left {
-	float: left;
-	width: 400px;
-}
-
-.right {
-}
-
-a:active, a:link, a:visited {
-	color: #330;
-	text-decoration: none;
-}
-
-a:hover {
-	text-decoration: underline;
-}
-
+{{ css|safe }}
 </style>
 
 </head>
 <body>
 
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+	<div id=flash>
+    {% for message in messages %}
+		{{ message }}<br />
+		{% endfor %}
+  {% endif %}
+ </div>
+{% endwith %}
+
+
 {% if show_upload %}
+<div id=upload>
 <form method=POST enctype=multipart/form-data action="{{ url_for("create", dirname=base_dir) }}">
-	<div class=left>upload:</div>
-	<div class=left><input type=file name=target /></div>
-	<div class=right><input type=submit value=upload name=what /></div><br />
+	<label>upload:</label>
+	<input type=file name=target /> <input type=submit value=upload name=what />
 </form>
-<hr />
+</div>
 {% endif %}
 
-<div class=left>current dir: </div><div class=right>{{ base_dir }}</div><br />
+<div id=curpath>
+	<label>current dir:</label>
+	{% for name, path in cur_path_toks %}
+		<a href={{ url_for("show", dirname=path) }}>{{ name }}</a> /
+	{% endfor %}
+</div><br />
+
+{% if show_newdir %}
+<div id=newdir>
+<form method=POST action="{{ url_for("create", dirname=base_dir) }}">
+	<label>new dir:</label>
+	<input type=text name=new_dirname /> <input type=submit value=add name=what />
+</form>
+</div>
+{% endif %}
+
+
 {% if show_dirs %}
+<div id=dirs><ul>
   {% if base_dir != "." %}
-	<div class=left><a href="{{ url_for("show", dirname=parent_path) }}">:: parent dir ::</a></div><br /><br />
+	<li>
+		<a class=name href="{{ url_for("show", dirname=parent_path) }}">..</a>
+		<a class=action>&nbsp;</a>
+	</li>
 	{% endif %}
 	{% for target, path in dirs %}
-		<div class=left><a href="{{ url_for("show", dirname=path) }}">{{ target }}</a></div>
-		<div class=right>
-			<a href="{{ url_for("delete", target=path) }}">delete</a>
-		</div>
-	{% endfor %}<br />
-<form method=POST action="{{ url_for("create", dirname=base_dir) }}">
-	<div class=left>new dir:</div>
-	<div class=left><input type=text name=new_dirname /></div>
-	<div class=right><input type=submit value=add name=what /></div>
-</form>
-<hr />
+	<li>
+		<a class=name href="{{ url_for("show", dirname=path) }}">{{ target }}</a>
+		<a class=action href="{{ url_for("delete", target=path) }}">delete</a>
+	</li>
+	{% endfor %}
+</ul></div>
 {% endif %}
+<br />
 
-{% if show_files %}
+
+{% if show_files and files %}
+<div id=files>
 <ul>
 {% for target, path in files %}
-<li class=file_item>
-<a class=left href={{ url_for("get_file", target=path ) }}>{{ target }}</a>
-<a class=right href={{ url_for("delete", target=path) }}>delete</a>
-</li>
+	<li class=file_item>
+  	<a class=name href="{{ url_for("get_file", target=path) }}">{{ target }}</a>
+		<a class=action href="{{ url_for("delete", target=path) }}">delete</a>
+	</li>
 {% endfor %}
 </ul>
+</div>
 {% endif %}
 
 </body>
