@@ -18,6 +18,8 @@ import yaml
 
 from file_db import FileDB, FileDBError
 
+from gen_pass import make_pass
+
 # determine config file path
 config_path = f"/srv/flask/{os.getlogin()}/mmupload/mmupload.yaml"
 if not os.path.exists(config_path):
@@ -38,11 +40,8 @@ app.register_blueprint(main, url_prefix="/")
 filedb = FileDB(cfg["file_destination"])
 
 
-def make_pass(pwd):
-    return hashlib.sha256(pwd.encode("utf-8") + b"//SALT//" +
-                          app.secret_key.encode("utf-8")).hexdigest()
-
 def check_auth_global(username, password):
+    print(username, password, cfg["user"], cfg["pwd"], make_pass(password))
     return username == cfg["user"] and cfg["pwd"] == make_pass(password)
 
 def check_auth_shared(share, username, password):

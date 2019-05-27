@@ -13,7 +13,7 @@
 
 {% with messages = get_flashed_messages() %}
   {% if messages %}
-	<div id=flash>
+	<div id=flash class=box>
     {% for message in messages %}
 		{{ message }}<br />
 		{% endfor %}
@@ -23,7 +23,7 @@
 
 
 {% if show_upload %}
-<div id=upload>
+<div id=upload class=box>
 <form method=POST enctype=multipart/form-data action="{{ url_for("create", dirname=base_dir) }}">
 	<label>upload:</label>
 	<input type=file name=target /> <input type=submit value=upload name=what />
@@ -31,7 +31,7 @@
 </div>
 {% endif %}
 
-<div id=curpath>
+<div id=curpath class=box>
 	<label>current dir:</label>
 	{% for name, path in cur_path_toks %}
 		<a href={{ url_for("show", dirname=path) }}>{{ name }}</a> /
@@ -39,7 +39,7 @@
 </div><br />
 
 {% if show_newdir %}
-<div id=newdir>
+<div id=newdir class=box>
 <form method=POST action="{{ url_for("create", dirname=base_dir) }}">
 	<label>new dir:</label>
 	<input type=text name=new_dirname /> <input type=submit value=add name=what />
@@ -49,7 +49,7 @@
 
 
 {% if show_dirs %}
-<div id=dirs><ul>
+<div id=dirs class=box><ul>
   {% if base_dir != "." %}
 	<li>
 		<a class=name href="{{ url_for("show", dirname=parent_path) }}">..</a>
