@@ -1,0 +1,24 @@
+
+# no static_url set will serve these locally
+#static_url: https://zapp-server.eu/static/mmupload/
+
+# necessary for startups
+#file_destination: /some/writeable/destination
+
+secret_key: 123456123456123456
+
+##### global username and password, use 'get_pass.py'
+user: myuser
+# pwd = adminadmin
+pwd: e65f7d97553794849e6ebfc079d937ab0462fda709d56cab3bf54eae3a4f0564
+
+
+# these below are not used yet...
+
+public:
+  - dwf32f4d/foo.txt
+
+shares_user: wasgeht
+
+shares:
+  21eddas: aldernein
