@@ -68,6 +68,8 @@ class FileDB:
         if target in self.get_contents(dirname):
             raise FileAlreadyExists(target)
 
+        print(dirname, target)
+
         path = self.get_path(target)
         if self.isdir(path) or self.isfile(path):
             raise FileAlreadyExists(target)
