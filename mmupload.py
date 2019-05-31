@@ -20,28 +20,48 @@ from file_db import FileDB, FileDBError
 
 from gen_pass import make_pass
 
-# determine config file path
-config_path = f"/srv/flask/{os.getlogin()}/mmupload/mmupload.yaml"
-if not os.path.exists(config_path):
-    print (f"target path not found: {config_path}")
-    print ("trying inside current workdir")
-    config_path = "mmupload.yaml"
+
+def load_config(config_path):
+    """load config in given 'config_path', on any error fail critical & exit!"""
     if not os.path.exists(config_path):
-        print (f"no configuration file found {config_path} -> exiting...")
+        print("config path: {config_path} not found, exiting...")
+        sys.exit(1)
+    cfg = yaml.load(open(config_path))
+
+    if "file_destination" not in cfg:
+        print("you must set 'file_destintion' to a writable path (dir), exiting...")
         sys.exit(1)
 
-cfg = yaml.load(open(config_path))
+    if not os.path.exists(cfg["file_destination"]) \
+      or not os.path.isdir(cfg["file_destination"]):
+        print ("your 'file_destination' is not existing or not r/w/x + (dir)")
+        # @todo: writeable check missing...
+        sys.exit(1)
+
+    if not "secret_key" in cfg:
+        print ("'secret_key' missing in configuration, exiting...")
+        sys.exit(1)
+
+    if not "user" in cfg or not "pwd" in cfg:
+        print ("no 'user' and 'pwd' provided in configuration, exiting...")
+        sys.exit(1)
+
+    return cfg
+
+cfg = load_config(sys.argv[1])
 
 app = Flask(__name__)
 app.secret_key = cfg["secret_key"]
-
 app.register_blueprint(main, url_prefix="/")
 
 filedb = FileDB(cfg["file_destination"])
 
 
+####
+#### utils
+####
+
 def check_auth_global(username, password):
-    print(username, password, cfg["user"], cfg["pwd"], make_pass(password))
     return username == cfg["user"] and cfg["pwd"] == make_pass(password)
 
 def check_auth_shared(share, username, password):
@@ -96,13 +116,15 @@ def show(dirname=""):
         if tok:
             cur_path_toks.append((tok, os.path.join(cur_path_toks[-1][1], tok)))
 
+    j = lambda *toks: os.path.join(*toks)
+
     return render_template("tmpl.html",
         css=css_content,
         show_dirs=True, show_upload=True if dirname != "" else False, show_files=True,
         show_newdir=True,
         cur_path_toks=cur_path_toks,
-        dirs=sorted(map(lambda d: (d, os.path.join(dirname, d)), filedb.get_dirs(dirname))),
-        files=sorted(map(lambda f: (f, os.path.join(dirname, f)), filedb.get_files(dirname))),
+        dirs=sorted(map(lambda d: (d, j(dirname, d)), filedb.get_dirs(dirname))),
+        files=sorted(map(lambda f: (f, j(dirname, f), filedb.get_size(j(dirname, f))), filedb.get_files(dirname))),
         parent_dir="" if dirname == "" else os.path.basename(parent),
         parent_path="" if dirname == "" else parent,
         base_dir=dirname if dirname != "" else ".",

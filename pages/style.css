@@ -1,0 +1,156 @@
+
+body {
+	background-color: grey;
+	font-family: Roboto;
+  font-size: 0.9em;
+  font-variant: all-small-caps;
+}
+
+input {
+	font-family: Roboto;
+  font-size: 0.9em;
+  font-variant: all-small-caps;
+	border: 1px solid black;
+	background-color: #aaaaa9;
+}
+
+label {
+	font-weight: bold;
+  text-align: left;
+}
+
+ul {
+	list-style: none;
+	padding: 0px;
+}
+
+li {
+	padding: 0;
+	position: relative;
+	padding-left: 34px;
+	height: 1.4em;
+	line-height:1.2em;
+	overflow: visible;
+}
+
+.box {
+  padding: 0;
+  background-color: #9595a5;
+  padding-left: 10px;
+  border: 2px solid #aaaaaa;
+}
+
+.info {
+	float:left;
+	text-align:right;
+	width: 5%;
+}
+
+li:before {
+	position: absolute;
+  	left: 6px;
+	color: #000000;
+	font-weight: bold;
+}
+
+li:hover {
+	background-color: #9f9fa9;
+}
+
+#files ul li:before {
+	content: '|F|';
+}
+#dirs ul li:before {
+	content: '|D|';
+}
+
+#flash {
+    position: fixed;
+    left: 50%;
+    top: 4px;
+		font-weight: bold;
+    line-height: 2em;
+    padding: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: #9292b5bb;
+}
+
+#upload, #newdir {
+    float: right;
+    width: 25%;
+    height: 2.4em;
+    line-height: 2.4em;
+}
+
+input[type=submit] {
+    text-align: right;
+    height: 1.7em;
+}
+
+input[type=file] {
+  text-align: right;
+  width: 60%;
+  margin-left: 5px;
+}
+input[type=text] {
+	height: 1.4em;
+}
+
+#files a.name, #dirs a.name {
+	font-weight: bold;
+	display: block;
+	float: left;
+	width: 50%;
+}
+#files a.action, #dirs a.action {
+	display: block;
+	float: left;
+	padding-left: 10px;
+	padding-right: 10px;
+	margin-right: 1em;
+	text-align: center;
+}
+
+#upload label {
+	float: left;
+}
+
+#files, #dirs {
+	float: left;
+	width: 70%;
+	margin-bottom: 1em;
+	padding-right: 10px;
+}
+
+
+#curpath {
+	width: 70%;
+	height: 2.4em;
+  	line-height: 2.4em;
+	text-align: left;
+	padding-right: 10px;
+}
+
+.left {
+	float: left;
+	width: 400px;
+}
+
+.right {
+}
+
+a:active, a:link, a:visited {
+	color: #454552;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #353542;
+	text-decoration: underline;
+}
+
+br {
+	clear: both;
+}
+

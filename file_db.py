@@ -43,6 +43,13 @@ class FileDB:
             raise InvalidPath(rel_path)
         return os.path.join(self.root_dir, rel_path)
 
+    def get_size(self, rel_path):
+        if self.isdir(rel_path):
+            raise NotImplementedError("directory size for: {rel_path}")
+        elif self.isfile(rel_path):
+            return os.path.getsize(self.get_path(rel_path))
+        raise FileDBError("unknown item passed to get_size())")
+
     def isdir(self, rel_path):
         return os.path.isdir(self.get_path(rel_path))
 

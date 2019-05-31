@@ -68,11 +68,12 @@
 
 
 {% if show_files and files %}
-<div id=files>
+<div id=files class=box>
 <ul>
-{% for target, path in files %}
+{% for target, path, filesize in files %}
 	<li class=file_item>
   	<a class=name href="{{ url_for("get_file", target=path) }}">{{ target }}</a>
+		<span class=info>{{ filesize }}</span>
 		<a class=action href="{{ url_for("delete", target=path) }}">delete</a>
 	</li>
 {% endfor %}
