@@ -97,8 +97,8 @@ def create(dirname=""):
         else:
             flash("invalid request")
     except FileDBError as e:
-        #flash(repr(e))
-        raise e
+        flash(repr(e))
+        #raise e
     return redirect(url_for("show", dirname=dirname))
 
 @app.route("/")
@@ -106,11 +106,8 @@ def create(dirname=""):
 @app.route("/dir/<path:dirname>")
 @requires_auth
 def show(dirname=""):
-    #print (filedb.get_dirs(dirname))
-    #print (filedb.get_files(dirname))
     parent = os.path.dirname(dirname)
     css_content = render_template("style.css")
-    print(css_content)
     cur_path_toks = [("[root]", "")]
     for tok in dirname.split(os.sep):
         if tok:
