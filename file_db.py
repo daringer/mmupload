@@ -22,7 +22,6 @@ class FileDB:
         self.root_dir = root_dir
 
     def get_contents(self, dirname=""):
-        print(dirname)
         if dirname != "":
             if not self.name_pat.match(dirname):
                 raise InvalidName(f"{dirname} (need: {self.raw_name_pat})")
@@ -39,6 +38,8 @@ class FileDB:
                 if self.isfile(os.path.join(dirname, p))]
 
     def get_path(self, rel_path):
+        if rel_path.startswith("/"):
+            rel_path = os.path.relpath(rel_path, self.root_dir)
         if rel_path.startswith("/") or ".." in rel_path:
             raise InvalidPath(rel_path)
         return os.path.join(self.root_dir, rel_path)
@@ -67,8 +68,6 @@ class FileDB:
         target = os.path.join(dirname, data.filename)
         if target in self.get_contents(dirname):
             raise FileAlreadyExists(target)
-
-        print(dirname, target)
 
         path = self.get_path(target)
         if self.isdir(path) or self.isfile(path):
