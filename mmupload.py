@@ -149,7 +149,7 @@ def delete(target):
 @requires_auth
 def get_file(target):
     try:
-      content = filedb.get_file(target)
+      content = filedb.get_file(target, as_iter=True)
       return Response(content, mimetype="octet/stream")
     except FileDBError as e:
       flash(repr(e))

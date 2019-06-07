@@ -90,9 +90,13 @@ class FileDB:
             raise NotDeletingRootDir()
         return os.rmdir(self.get_path(dirname))
 
-    def get_file(self, rel_path):
+    def get_file(self, rel_path, as_iter=False):
         path = self.get_path(rel_path)
         if not self.isfile(rel_path):
-          raise NotAFileError(path)
-        return open(path).read()
+            raise NotAFileError(path)
+
+        if as_iter:
+            return (line for line in open(path, "rb"))
+        else:
+            return open(path, "rb").read()
 
