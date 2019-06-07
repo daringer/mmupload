@@ -3,9 +3,9 @@ import os
 from functools import wraps
 
 import hashlib
+import mimetypes
 
-
-from flask import Flask, render_template, request, flash, redirect, Response, url_for
+from flask import Flask, render_template, request, flash, redirect, Response, url_for, send_file
 from flask import Blueprint, render_template
 
 from werkzeug import secure_filename
@@ -149,8 +149,27 @@ def delete(target):
 @requires_auth
 def get_file(target):
     try:
-      content = filedb.get_file(target, as_iter=True)
-      return Response(content, mimetype="octet/stream")
+      #content = filedb.get_file(target, as_iter=True)
+      #mime_info = mimetypes.guess_type(filedb.get_path(target))
+      #resp = Response(content)
+      #resp.headers = Headers({
+      #      "Pragma": "public",
+      #      "Expires": "0",
+      #      "Cache-Control": "must-revalidate, post-check=0, pre-check=0",
+      #      "Cache-Control": "private",
+      #      "Content-Type": mime_info[0],
+      #      "Content-Disposition": f"attachment; filename=\"{filename}\";",
+      #      "Content-Transfer-Encoding": "binary",
+      #      "Content-Length": len(response.data)
+      #})
+      #if not mime_info[1] is None:
+      #   resp.headers.add_header("Content-Encoding", mime_info[1])
+
+      #return resp
+      fn = filedb.get_path(target)
+      mime_info = mimetypes.guess_type(fn)
+      return send_file(fn, mimetype=mime_info[0])
+
     except FileDBError as e:
       flash(repr(e))
       return redirect(url_for("show", dirname=os.path.dirname(target)))

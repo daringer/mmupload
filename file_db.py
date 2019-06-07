@@ -96,7 +96,7 @@ class FileDB:
             raise NotAFileError(path)
 
         if as_iter:
-            return (line for line in open(path, "rb"))
+            return (line for line in open(path))
         else:
-            return open(path, "rb").read()
+            return open(path).read()
 
