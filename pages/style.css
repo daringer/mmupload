@@ -66,8 +66,8 @@ li:hover {
 
 #flash {
     position: fixed;
-    left: 50%;
-    top: 4px;
+    right: 50px;
+    bottom: 38px;;
 		font-weight: bold;
     line-height: 2em;
     padding: 0;
