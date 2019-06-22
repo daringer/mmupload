@@ -80,6 +80,8 @@ def requires_auth(f):
             return http_authenticate()
         return f(*args, **kwargs)
     return decorated
+requires_zone_auth = requires_auth
+
 
 @app.route("/new/", methods=["POST"])
 @app.route("/new/<path:dirname>", methods=["POST"])
@@ -144,28 +146,8 @@ def delete(target):
         flash(repr(e))
     return redirect(url_for("show", dirname=os.path.dirname(target)))
 
-
-@app.route("/get/<path:target>", methods=["GET"])
-@requires_auth
-def get_file(target):
+def file_get_helper(target):
     try:
-      #content = filedb.get_file(target, as_iter=True)
-      #mime_info = mimetypes.guess_type(filedb.get_path(target))
-      #resp = Response(content)
-      #resp.headers = Headers({
-      #      "Pragma": "public",
-      #      "Expires": "0",
-      #      "Cache-Control": "must-revalidate, post-check=0, pre-check=0",
-      #      "Cache-Control": "private",
-      #      "Content-Type": mime_info[0],
-      #      "Content-Disposition": f"attachment; filename=\"{filename}\";",
-      #      "Content-Transfer-Encoding": "binary",
-      #      "Content-Length": len(response.data)
-      #})
-      #if not mime_info[1] is None:
-      #   resp.headers.add_header("Content-Encoding", mime_info[1])
-
-      #return resp
       fn = filedb.get_path(target)
       mime_info = mimetypes.guess_type(fn)
       return send_file(fn, mimetype=mime_info[0])
@@ -173,6 +155,76 @@ def get_file(target):
     except FileDBError as e:
       flash(repr(e))
       return redirect(url_for("show", dirname=os.path.dirname(target)))
+
+
+#@app.route("/s/<zone>/<s_id>", methods=["POST", "GET", "DELETE"])
+#@app.route("/s/<zone>", methods=["POST", "DELETE"])
+@app.route("/s/x/<s_id>",   methods=["GET"])
+@app.route("/s/x",          methods=["POST", "DELETE"])
+@requires_zone_auth
+def safe_shorties(zone, s_id=None):
+    return shorties(zone, s_id)
+
+@app.route("/s/pub/<s_id>", methods=["GET"])
+@app.route("/s/pub",        methods=["POST", "DELETE"])
+def shorties(zone, s_id=None):
+    if request.method == "POST":
+
+        new_shorty = request.form.get("new_shorty").strip()
+
+        if not filedb.name_pat.match(new_shorty):
+            flash("illegal shorty, need {filedb.raw_name_pat} (minus slash '/')")
+
+        elif "/" in new_shorty:
+            flash("no slashes allowed inside shorties")
+
+        elif new_shorty in cfg["shorties"][zone]:
+            flash("shorty already exists, please try another one")
+
+        elif zone in cfg["shorties"] and len(new_shorty) > 4:
+            #shorty_url = "/s/{zone}/{new_shorty}"
+            shorty_url = url_for("shorties",  zone=zone, s_id=new_shorty)
+            flash("shorty created, url: {shorty_url}")
+            cfg["shorties"][zone][new_shorty] = target
+            ########################
+            # @TODO: database is dirty, need save!(!)
+            ########################
+
+    elif request.method == "DELETE":
+        s_id = request.form.get("old_shorty")
+        if zone in cfg["shorties"] and s_id in cfg["shorties"][zone]:
+            del cfg["shorties"][zone][s_id]
+            flash("removed shorty: {s_id} in zone: {zone}")
+            ########################
+            # @TODO: database is dirty, need save!(!)
+            ########################
+            ########################
+            ########################
+    else:
+        # path is always relative! no abs-paths inside the DB
+        path = cfg["shorties"].get(zone, {}).get(s_id)
+        if not path:
+            flash("invalid")
+            # @TODO @TODO
+            # @TODO: return redirect() <- to a 404 error page"
+            # @TODO @TODO
+            return file_get_helper(path)
+
+
+############
+## just write / load database
+## add 404 for the errors, they shall not be forwarded on misses
+## yeah and what about the frontend ...
+
+
+
+
+
+
+@app.route("/get/<path:target>", methods=["GET"])
+@requires_auth
+def get_file(target):
+    return  file_get_helper(target)
 
 
 #@app.route("/get/<file_id>", methods=["GET"])
