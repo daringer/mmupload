@@ -20,6 +20,10 @@ def make_pass(pwd):
         mmupload.app.secret_key.encode("utf-8")).hexdigest()
 
 if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print(f"Usage: {sys.argv[0]} <mmupload-config-path>")
+        sys.exit(1)
+
     pwd = getpass.getpass("Password: ")
     pwd2 = getpass.getpass("Password (repeat): ")
     if pwd != pwd2:
