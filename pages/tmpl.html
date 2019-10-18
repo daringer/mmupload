@@ -1,10 +1,13 @@
 <!doctype html>
 <head lang=en>
 <meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
 <title>Fancy Uploader Frontend</title>
 
+<script src="{{ url_for("get_static", target="jquery-3.4.1.min.js") }}" type="text/javascript" charset="utf-8"></script>
 
-<style type="text/css">
+<style type="text/css" media="screen">
 {{ css|safe }}
 </style>
 
@@ -75,7 +78,47 @@
   	<a class=name href="{{ url_for("get_file", target=path) }}">{{ target }}</a>
 		<span class=info>{{ filesize }}</span>
 		<a class=action href="{{ url_for("delete", target=path) }}">delete</a>
+		{% if show_editor and path == editor_target %}
+  		<form method=POST action="{{ url_for("create", dirname=base_dir) }}" name="editor">
+  		<input type=hidden name=filename value="{{ target }}" />
+	  	<input type=hidden name=contents value="" />
+			<input type=submit value=save name=what />
+	  	</form>
+		{% else %}
+  		<a class=action href="{{ url_for("edit", target=path) }}">edit</a>
+		{% endif %}
 	</li>
+	{% if show_editor and path == editor_target %}
+	  <pre id="editor"></pre>
+			<script src="{{ url_for("get_static", target="ace/src-min/ace.js") }}" type="text/javascript" charset="utf-8"></script>
+	  <script>
+      var editor = ace.edit("editor");
+      editor.setTheme("ace/theme/twilight");
+      //editor.session.setMode("ace/mode/javascript");
+
+			$(function() {
+				$.ajax({
+					type: "GET",
+					url: "{{ url_for('get_raw_file', target=path) }}",
+					error: function() {
+						alert("error getting raw file contents... DO NOT SAVE (@todo)");
+					},
+					success: function(ret, url) {
+						$("form[name=editor] input[name=contents]").val(ret);
+						editor.setValue(ret);
+						editor.clearSelection();
+					}
+				});
+
+				$("form[name=editor] input[name=what]").click(function(ev) {
+						$("form[name=editor] input[name=contents]").val(editor.getValue());
+						//ev.preventDefault();
+					  //alert($("form[name=editor] input[name=contents]").val());
+				});
+
+			});
+	  </script>
+	{% endif %}
 {% endfor %}
 </ul>
 </div>

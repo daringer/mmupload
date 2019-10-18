@@ -6,7 +6,7 @@ import hashlib
 import mimetypes
 
 from flask import Flask, render_template, request, flash, redirect, Response, url_for, send_file
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, jsonify
 
 from werkzeug import secure_filename
 
@@ -83,12 +83,26 @@ def requires_auth(f):
 requires_zone_auth = requires_auth
 
 
+
+@app.route("/local/<path:target>", methods=["GET"])
+@requires_auth
+def get_static(target=""):
+    p = os.path.join("static", target)
+    data = None
+    with open(p, "r") as fd:
+        data = fd.read()
+    mime_info = mimetypes.guess_type(p)
+    return Response(data, mimetype=mime_info[0])
+
+
+
 @app.route("/new/", methods=["POST"])
 @app.route("/new/<path:dirname>", methods=["POST"])
 @requires_auth
 def create(dirname=""):
     try:
-        if request.form.get("what") == "add" and len(request.form.get("new_dirname").strip()) > 0:
+        if request.form.get("what") == "add" and \
+          len(request.form.get("new_dirname").strip()) > 0:
             new_dirname = request.form.get("new_dirname")
             filedb.create_dir(dirname, new_dirname)
             flash(f"directory created: {new_dirname}")
@@ -96,6 +110,11 @@ def create(dirname=""):
             app.config["UPLOADS_FILES_DEST"] = filedb.get_path(dirname)
             filename = filedb.create_file(dirname, request.files["target"])
             flash(f"Saved to: {filename}")
+        elif request.form.get("what") == "save":
+            app.config["UPLOADS_FILES_DEST"] = filedb.get_path(dirname)
+            filename = filedb.update_file(dirname,
+              request.form.get("filename"), request.form.get("contents"))
+            flash(f"Updated file: {filename}")
         else:
             flash("invalid request")
     except FileDBError as e:
@@ -107,7 +126,7 @@ def create(dirname=""):
 @app.route("/dir/")
 @app.route("/dir/<path:dirname>")
 @requires_auth
-def show(dirname=""):
+def show(dirname="", editor_target=None):
     parent = os.path.dirname(dirname)
     css_content = render_template("style.css")
     cur_path_toks = [("[root]", "")]
@@ -119,16 +138,30 @@ def show(dirname=""):
 
     return render_template("tmpl.html",
         css=css_content,
-        show_dirs=True, show_upload=True if dirname != "" else False, show_files=True,
+        show_dirs=True,
+        show_upload=True if dirname != "" else False,
+        show_files=True,
         show_newdir=True,
         cur_path_toks=cur_path_toks,
-        dirs=sorted(map(lambda d: (d, j(dirname, d)), filedb.get_dirs(dirname))),
-        files=sorted(map(lambda f: (f, j(dirname, f), filedb.get_size(j(dirname, f))), filedb.get_files(dirname))),
+        show_editor=editor_target is not None,
+        editor_target=editor_target,
+        dirs=sorted(map(
+            lambda d: (d, j(dirname, d)),
+            filedb.get_dirs(dirname))),
+        files=sorted(map(
+            lambda f: (f, j(dirname, f), filedb.get_size(j(dirname, f))),
+            filedb.get_files(dirname))),
         parent_dir="" if dirname == "" else os.path.basename(parent),
         parent_path="" if dirname == "" else parent,
         base_dir=dirname if dirname != "" else ".",
         base_dir_name=os.path.basename(dirname if dirname != "" else ".")
     )
+
+@app.route("/edit/<path:target>", methods=["GET"])
+@requires_auth
+def edit(target):
+    return show(dirname=os.path.dirname(target), editor_target=target)
+
 
 @app.route("/del/<path:target>", methods=["GET"])
 @requires_auth
@@ -146,15 +179,21 @@ def delete(target):
         flash(repr(e))
     return redirect(url_for("show", dirname=os.path.dirname(target)))
 
-def file_get_helper(target):
+def file_get_helper(target, raw=False):
     try:
-      fn = filedb.get_path(target)
-      mime_info = mimetypes.guess_type(fn)
-      return send_file(fn, mimetype=mime_info[0])
+        fn = filedb.get_path(target)
+        mime_info = mimetypes.guess_type(fn)
+        if raw:
+            out = None
+            with open(fn, "r") as fd:
+                out = fd.read()
+            return out
+        else:
+            return send_file(fn, mimetype=mime_info[0])
 
     except FileDBError as e:
-      flash(repr(e))
-      return redirect(url_for("show", dirname=os.path.dirname(target)))
+        flash(repr(e))
+        return redirect(url_for("show", dirname=os.path.dirname(target)))
 
 
 #@app.route("/s/<zone>/<s_id>", methods=["POST", "GET", "DELETE"])
@@ -217,15 +256,19 @@ def shorties(zone, s_id=None):
 ## yeah and what about the frontend ...
 
 
-
-
-
-
-@app.route("/get/<path:target>", methods=["GET"])
+@app.route("/get/download/<path:target>", methods=["GET"])
 @requires_auth
 def get_file(target):
-    return  file_get_helper(target)
+    return file_get_helper(target)
 
+@app.route("/get/raw/<path:target>", methods=["GET"])
+@requires_auth
+def get_raw_file(target):
+    return jsonify(file_get_helper(target, raw=True))
+
+@app.route("/get/<path:target>", methods=["GET"])
+def get_file_short(target):
+    return get_file(target)
 
 #@app.route("/get/<file_id>", methods=["GET"])
 #def get_pub_file(file_id):

@@ -64,6 +64,17 @@ class FileDB:
             raise DirAlreadyExists(new_dir)
         return os.makedirs(self.get_path(os.path.join(dirname, new_dir)))
 
+    def update_file(self, dirname, filename, contents):
+        target = os.path.join(dirname, filename)
+        path = self.get_path(target)
+        if not self.isfile(path):
+            raise FileNotExisting(target)
+
+        with open(path, "w") as fd:
+            fd.write(contents)
+
+        return path
+
     def create_file(self, dirname, data):
         target = os.path.join(dirname, data.filename)
         if target in self.get_contents(dirname):
