@@ -128,7 +128,6 @@ def create(dirname=""):
 @requires_auth
 def show(dirname="", editor_target=None):
     parent = os.path.dirname(dirname)
-    css_content = render_template("style.css")
     cur_path_toks = [("[root]", "")]
     for tok in dirname.split(os.sep):
         if tok:
@@ -137,7 +136,6 @@ def show(dirname="", editor_target=None):
     j = lambda *toks: os.path.join(*toks)
 
     return render_template("tmpl.html",
-        css=css_content,
         show_dirs=True,
         show_upload=True if dirname != "" else False,
         show_files=True,
