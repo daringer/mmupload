@@ -8,7 +8,7 @@ import mimetypes
 from flask import Flask, render_template, request, flash, redirect, Response, url_for, send_file
 from flask import Blueprint, render_template, jsonify
 
-from werkzeug import secure_filename
+from werkzeug.utils import secure_filename
 
 main = Blueprint("main", __name__, template_folder="pages")
 
@@ -26,7 +26,7 @@ def load_config(config_path):
     if not os.path.exists(config_path):
         print("config path: {config_path} not found, exiting...")
         sys.exit(1)
-    cfg = yaml.load(open(config_path))
+    cfg = yaml.safe_load(open(config_path))
 
     if "file_destination" not in cfg:
         print("you must set 'file_destintion' to a writable path (dir), exiting...")
@@ -61,6 +61,17 @@ filedb = FileDB(cfg["file_destination"])
 #### utils
 ####
 
+def render_page(dirname, msgs=None, editor_target=None):
+    parent = os.path.dirname(dirname)
+    return render_template("tmpl.html",
+        editor_target=editor_target,
+        parent_dir="" if dirname == "" else os.path.basename(parent),
+        parent_path="" if dirname == "" else parent,
+        base_dir=dirname if dirname != "" else ".",
+        base_dir_name=os.path.basename(dirname if dirname != "" else "."),
+        messages=msgs if msgs is not None else []
+    )
+
 def check_auth_global(username, password):
     return username == cfg["user"] and cfg["pwd"] == make_pass(password)
 
@@ -83,6 +94,9 @@ def requires_auth(f):
 requires_zone_auth = requires_auth
 
 
+####
+#### endpoints
+####
 
 @app.route("/local/<path:target>", methods=["GET"])
 @requires_auth
@@ -94,88 +108,91 @@ def get_static(target=""):
     mime_info = mimetypes.guess_type(p)
     return Response(data, mimetype=mime_info[0])
 
-
-
 @app.route("/new/", methods=["POST"])
 @app.route("/new/<path:dirname>", methods=["POST"])
 @requires_auth
 def create(dirname=""):
     try:
-        if request.form.get("what") == "add" and \
+        if request.form.get("what") == "create" and \
           len(request.form.get("new_dirname").strip()) > 0:
             new_dirname = request.form.get("new_dirname")
             filedb.create_dir(dirname, new_dirname)
-            flash(f"directory created: {new_dirname}")
+            msg = f"directory created: {new_dirname}"
+
         elif request.form.get("what") == "upload":
             app.config["UPLOADS_FILES_DEST"] = filedb.get_path(dirname)
             filename = filedb.create_file(dirname, request.files["target"])
-            flash(f"Saved to: {filename}")
+            msg = f"Saved to: {filename}"
+
         elif request.form.get("what") == "save":
             app.config["UPLOADS_FILES_DEST"] = filedb.get_path(dirname)
             filename = filedb.update_file(dirname,
               request.form.get("filename"), request.form.get("contents"))
-            flash(f"Updated file: {filename}")
+            msg = f"Updated file: {filename}"
+
         else:
-            flash("invalid request")
+            msg = "invalid request"
     except FileDBError as e:
-        flash(repr(e))
-        #raise e
-    return redirect(url_for("show", dirname=dirname))
+        msg = repr(e)
+    return jsonify({"dirname": dirname, "msgs": [msg]})
 
 @app.route("/")
 @app.route("/dir/")
 @app.route("/dir/<path:dirname>")
 @requires_auth
-def show(dirname="", editor_target=None):
-    parent = os.path.dirname(dirname)
-    cur_path_toks = [("[root]", "")]
-    for tok in dirname.split(os.sep):
-        if tok:
-            cur_path_toks.append((tok, os.path.join(cur_path_toks[-1][1], tok)))
+def show(dirname=""):
+    return render_page(dirname)
 
-    j = lambda *toks: os.path.join(*toks)
+@app.route("/list/<string:what>/")
+@app.route("/list/<string:what>/<path:dirname>")
+@requires_auth
+def ls(what, dirname=""):
+    raw_list = map(lambda p: {"name": p, "path": os.path.join(dirname, p)},
+        filedb.get_dirs(dirname) if what == "dirs" else \
+        filedb.get_files(dirname))
 
-    return render_template("tmpl.html",
-        show_dirs=True,
-        show_upload=True if dirname != "" else False,
-        show_files=True,
-        show_newdir=True,
-        cur_path_toks=cur_path_toks,
-        show_editor=editor_target is not None,
-        editor_target=editor_target,
-        dirs=sorted(map(
-            lambda d: (d, j(dirname, d)),
-            filedb.get_dirs(dirname))),
-        files=sorted(map(
-            lambda f: (f, j(dirname, f), filedb.get_size(j(dirname, f))),
-            filedb.get_files(dirname))),
-        parent_dir="" if dirname == "" else os.path.basename(parent),
-        parent_path="" if dirname == "" else parent,
-        base_dir=dirname if dirname != "" else ".",
-        base_dir_name=os.path.basename(dirname if dirname != "" else ".")
-    )
+    data = list(map(lambda dct: {
+          "name": dct["name"],
+          "path": dct["path"],
+          "size": filedb.get_size(dct["path"]),
+          "delete_url": url_for("delete", target=dct["path"]),
+          "move_url": url_for("move", target=dct["path"]),
+          "click_url": url_for("ls", what=what, dirname=dct["path"]) \
+            if what == "dirs" else url_for("get_file", target=dct["path"])
+        }, raw_list))
+
+    data = {"data": data, "upload_url": url_for("create", dirname=dirname)}
+    return jsonify(data)
 
 @app.route("/edit/<path:target>", methods=["GET"])
 @requires_auth
 def edit(target):
-    return show(dirname=os.path.dirname(target), editor_target=target)
+    return render_page(dirname=os.path.dirname(target), editor_target=target)
 
+@app.route("/move/<path:target>", methods=["POST"])
+@requires_auth
+def move(target):
+    old_parent = os.path.dirname(target)
+    new_target = os.path.join(old_parent, request.form.get("new_target"))
+    try:
+        filedb.move_path(target, new_target)
+    except OSError as e:
+        return jsonify({"msg": repr(e), "state": "fail"})
+    return jsonify({"msg": f"'{target}' moved to '{new_target}'", "state": "ok"})
 
-@app.route("/del/<path:target>", methods=["GET"])
+@app.route("/del/<path:target>", methods=["POST"])
 @requires_auth
 def delete(target):
     try:
         if filedb.isdir(target):
             filedb.delete_dir(target)
-            flash(f"deleted dir: {target}")
         elif filedb.isfile(target):
             filedb.delete_file(target)
-            flash(f"deleted file: {target}")
         else:
             raise ValueError(target)
     except FileDBError as e:
-        flash(repr(e))
-    return redirect(url_for("show", dirname=os.path.dirname(target)))
+        return jsonify({"msg": repr(e), "state": "fail"})
+    return jsonify({"msg": f"'{target}' deleted", "state": "ok"})
 
 def file_get_helper(target, raw=False):
     try:
@@ -190,8 +207,8 @@ def file_get_helper(target, raw=False):
             return send_file(fn, mimetype=mime_info[0])
 
     except FileDBError as e:
-        flash(repr(e))
-        return redirect(url_for("show", dirname=os.path.dirname(target)))
+        msg = repr(e)
+        return render_page(os.path.dirnane(target), [msg])
 
 
 #@app.route("/s/<zone>/<s_id>", methods=["POST", "GET", "DELETE"])

@@ -1,18 +1,22 @@
 
 body {
-	background-color: grey;
-	font-family: Roboto;
+	background-color: #bababc;
+	font-family: Monaco;
   font-size: 0.9em;
-  font-variant: all-small-caps;
 	overflow: hidden;
 }
 
-input {
-	font-family: Roboto;
+input, input[type=submit], input[type=text], input[type=file], input[type=submit], input[type=number] {
   font-size: 0.9em;
-  font-variant: all-small-caps;
-	border: 1px solid black;
-	background-color: #aaaaa9;
+	border: 1px solid #7a7a7a;
+  background-color: #c4c4c5;
+	box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);
+	padding: 3px;
+	margin-left: 5px;
+}
+
+input[type=button] {
+	box-shadow: none;
 }
 
 label {
@@ -20,90 +24,77 @@ label {
   text-align: left;
 }
 
-ul {
-	list-style: none;
-	padding: 0px;
+#upload, #newdir, #files, #dirs, #curpath {
+	width: 90%;
+  margin-left: auto ;
+  margin-right: auto ;
 }
 
-li {
-	padding: 0;
-	position: relative;
-	padding-left: 34px;
-	height: 1.4em;
-	line-height:1.2em;
-	overflow: visible;
-}
-
-.box {
-  padding: 0;
-  background-color: #9595a5;
-  padding-left: 10px;
-  border: 2px solid #aaaaaa;
-}
-
-.info {
-	float:left;
-	text-align:right;
-	width: 5%;
-}
-
-li:before {
-	position: absolute;
-  	left: 6px;
-	color: #000000;
-	font-weight: bold;
-}
-
-li:hover {
-	background-color: #9f9fa9;
-}
-
-#files ul li:before {
-	content: '|F|';
-}
-#dirs ul li:before {
-	content: '|D|';
+.toplvlbox {
+  background-color: #cccccc;
+	box-shadow:  1px 2px 2px rgba(0, 0, 0, .15);
+	margin-top: 8px;
+  line-height: 2.4em;
+  padding: 6px;
+  border: 1px solid #7a7a7a;
 }
 
 #flash {
     position: fixed;
-    right: 50px;
-    bottom: 38px;;
-		font-weight: bold;
-    line-height: 2em;
-    padding: 0;
-    padding-left: 10px;
-    padding-right: 10px;
-    background-color: #9292b5bb;
+    left: 40%;
+    top: 3px;
+		padding: 0;
+		border: 0;
+		background-color: unset;
+		width: 20%;
+		text-align: center;
 }
 
-#upload, #newdir {
-    float: right;
-    width: 25%;
-    height: 2.4em;
-    line-height: 2.4em;
+#flash div {
+   	font-weight: bold;
+    padding: 4px;
+    background-color: #ab6666;
+		opacity: 0.65;
+		margin-top: 4px;
+		z-index: 1000;
 }
 
-input[type=submit] {
-    text-align: right;
-    height: 1.7em;
+.jsgrid-row, .jsgrid-alt-row, .jsgrid-header-row, .jsgrid-filter-row,
+.jsgrid-insert-row, .jsgrid-grid-body, .jsgrid-header-scrollbar,
+.jsgrid-nodata-row {
+		background-color: unset;
+		overflow: unset;
+		border: 0;
+		line-height: 1.4em;
 }
 
-input[type=file] {
-  text-align: right;
-  width: 60%;
-  margin-left: 5px;
+.jsgrid-cell, .jsgrid-row>.jsgrid-cell, .jsgrid-alt-row>.jsgrid-cell, .jsgrid-edit-row,
+.jsgrid-header-row>.jsgrid-header-cell, .jsgrid-nodata-row>.jsgrid-cell, .jsgrid-edit-row>.jsgrid-cell {
+		background-color: unset;
+		overflow: unset;
+		border: 0;
+		border-top: 1px solid #bebebe;
+		margin: 2px;
 }
 
-input[type=text] {
-	height: 1.4em;
+ .jsgrid-row:hover, .jsgrid-alt-row:hover {
+		background-color: #bfbfbf;
+}
+
+.jsgrid-header-row>.jsgrid-header-cell {
+		border: 0;
+		border-bottom: 2px solid #7a7a7a;
+		text-align: left;
+		background-color: unset;
+}
+
+#flash div .err {
+		background-color: #db02b5bb;
 }
 
 #files a.name, #dirs a.name {
 	font-weight: bold;
 	display: block;
-	float: left;
-	width: 50%;
 }
 
 #files a.action, #dirs a.action {
@@ -117,21 +108,6 @@ input[type=text] {
 
 #upload label {
 	float: left;
-}
-
-#files, #dirs {
-	float: left;
-	width: 70%;
-	margin-bottom: 1em;
-	padding-right: 10px;
-}
-
-#curpath {
-	width: 70%;
-	height: 2.4em;
-  line-height: 2.4em;
-	text-align: left;
-	padding-right: 10px;
 }
 
 #editor {

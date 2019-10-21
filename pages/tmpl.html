@@ -1,72 +1,222 @@
 <!doctype html>
 <head lang=en>
-<meta charset="UTF-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-<title>Fancy Uploader Frontend</title>
+	<title>Fancy Uploader Frontend</title>
 
-<script src="{{ url_for("get_static", target="jquery-3.4.1.min.js") }}" type="text/javascript" charset="utf-8"></script>
+	<script src="{{ url_for("get_static", target="jquery-3.4.1.min.js") }}"
+		type="text/javascript" charset="utf-8"></script>
+	<script src="{{ url_for("get_static", target="jquery.form.js") }}"
+		type="text/javascript" charset="utf-8"></script>
+	<script src="{{ url_for("get_static", target="jsgrid/dist/jsgrid.min.js") }}"
+		type="text/javascript" charset="utf-8"></script>
 
-<link rel="stylesheet" href="{{ url_for("get_static", target="style.css") }}" />
+	<link rel="stylesheet" href="{{ url_for("get_static",
+											target="jsgrid/dist/jsgrid-theme.min.css") }}" />
+	<link rel="stylesheet" href="{{ url_for("get_static",
+											target="jsgrid/dist/jsgrid.min.css") }}" />
+	<link rel="stylesheet" href="{{ url_for("get_static",
+											target="style.css") }}" />
+
+	<script src="{{ url_for("get_static", target="main.js") }}"
+		type="text/javascript" charset="utf-8"></script>
 
 </head>
+<script>
+  	var current_dir = "{{ base_dir }}";
+		// hack, @fixme
+		if (current_dir == ".")
+			current_dir = "";
+
+		$(function() {
+			{% for msg in messages %}
+				show_message("{{msg}}"):
+			{% endfor %}
+		});
+</script>
+
 <body>
 
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
-	<div id=flash class=box>
-    {% for message in messages %}
-		{{ message }}<br />
-		{% endfor %}
-  {% endif %}
- </div>
-{% endwith %}
+<header>
+	<div id=flash class=toplvlbox></div>
+	<div id=curpath class=toplvlbox></div>
+</header>
+
+<main>
+
+	<aside>
+		<div id=upload class=toplvlbox>
+			<form method=POST enctype=multipart/form-data method="post"
+					  action="{{ url_for("create", dirname=base_dir) }}" name=upload>
+				<label>upload file: </label>
+				<input type=file name=target />
+				<input type=submit value=upload name=what />
+			</form>
+		</div>
+	</aside>
+
+	<aside>
+		<div id=newdir class=toplvlbox>
+		<form method=POST action="{{ url_for("create", dirname=base_dir) }}"
+					name=newdir method=post>
+			<label>new directory: </label>
+			<input type=text name=new_dirname value=""/>
+			<input type=submit value=create name=what />
+		</form>
+		</div>
+	</aside>
+
+	<article>
+		<div id=dirs class=toplvlbox></div>
+	</article>
+
+	<article>
+		<div id=files class=toplvlbox></div>
+	</article>
+
+</main>
 
 
-{% if show_upload %}
-<div id=upload class=box>
-<form method=POST enctype=multipart/form-data action="{{ url_for("create", dirname=base_dir) }}">
-	<label>upload:</label>
-	<input type=file name=target /> <input type=submit value=upload name=what />
-</form>
-</div>
-{% endif %}
+<script>
+var dir_grid = $("#dirs").jsGrid({
 
-<div id=curpath class=box>
-	<label>current dir:</label>
-	{% for name, path in cur_path_toks %}
-		<a href={{ url_for("show", dirname=path) }}>{{ name }}</a> /
-	{% endfor %}
-</div><br />
+    width: "90%",
 
-{% if show_newdir %}
-<div id=newdir class=box>
-<form method=POST action="{{ url_for("create", dirname=base_dir) }}">
-	<label>new dir:</label>
-	<input type=text name=new_dirname /> <input type=submit value=add name=what />
-</form>
-</div>
-{% endif %}
+    editing: true,
+    sorting: true,
+
+    fields: [
+        { name: "name", title: "Directory Name", type: "text", width: 150 },
+        { name: "path", type: "text", visible: false},
+        { name: "move_url", type: "text", visible: false},
+        { name: "delete_url", type: "text", visible: false},
+        { name: "click_url", type: "text", visible: false},
+        { name: "size", title: "Tree Size", type: "number", align: "left" },
+        { type: "control", width: 20 }
+    ],
+
+    rowClick: function(args) {
+			update_grid("dirs", args.item.path);
+			update_grid("files", args.item.path, true);
+		},
+		// before updating is done in grid
+		onItemUpdating: function(args) {
+				if (args.item.name != "")
+						$.ajax({
+							type: "POST",
+							data: {new_target: args.item.name},
+							url: args.item.move_url,
+							error: function() { show_message("error moving", true); },
+							success: function(ret) {
+								show_message(ret["msg"]);
+							}
+						})
+		},
+		// before deletion is done in grid
+    onItemDeleting: function(args) {
+			$.ajax({
+				type: "POST",
+				url: args.item.delete_url,
+				error: function() {	show_message("error deleting path", true);	},
+				success: function(ret) {
+					show_message(ret["msg"]);
+				}
+			});
+		}
+});
+
+var file_grid = $("#files").jsGrid({
+
+    width: "90%",
+
+    //height: "400px",
+
+    editing: true,
+    sorting: true,
+
+    fields: [
+        { name: "name", title: "Name", type: "text", width: 150 },
+        { name: "path", type: "text", visible: false},
+        { name: "move_url", type: "text", visible: false},
+        { name: "delete_url", type: "text", visible: false},
+        { name: "click_url", type: "text", visible: false},
+        { name: "size", title: "Size", type: "number", align: "left" },
+        { type: "control", width: 20 }
+    ],
+    rowClick: function(args) {
+				window.location = args.item.click_url;
+		},
+		// before updating is done in grid
+		onItemUpdating: function(args) {
+				if (args.item.name != "")
+						$.ajax({
+							type: "POST",
+							data: { new_target: args.item.name },
+							url: args.item.move_url,
+							error: function() { show_message("error moving", true); },
+							success: function(ret) { show_message(ret["msg"]); }
+						});
+		},
+		// before deletion is done in grid
+    onItemDeleting: function(args) {
+			$.ajax({
+				type: "POST",
+				url: args.item.delete_url,
+				error: function() {
+					show_message("error deleting path", true);
+				},
+				success: function(ret) {
+					show_message(ret["msg"]);
+				}
+			});
+		}
+});
+
+$(function() {
+	update_grid("dirs", current_dir);
+	update_grid("files", current_dir, true);
+
+	$("form[name=newdir]").submit(function(ev) {
+		ev.preventDefault();
+
+		var newdir_name = $("form[name=newdir] input[name=new_dirname]").val();
+		$.ajax({
+			type: "POST",
+			data: { what: "create", new_dirname: newdir_name },
+			url: $("form[name=newdir]").attr("action"),
+			error: function() {
+				show_message(`failed creation directory: {newdir_name}`);
+			},
+			success:  function(ret) {
+				ret.msgs.forEach(show_message);
+				update_grid("dirs", ret.dirname);
+				update_active_directory(ret.dirname);
+				$("form[name=newdir] input[type=text]").val("");
+			}
+		});
+	});
+
+	$("#upload").ajaxForm(function(ret) {
+  	show_message("file uploaded successfully");
+		update_grid("files", current_dir);
+  });
+
+	var editor = ace.edit("editor");
+  editor.setTheme("ace/theme/twilight");
+  //editor.session.setMode("ace/mode/javascript");
+
+	/*$("form[name=editor] input[name=what]").click(function(ev) {
+			$("form[name=editor] input[name=contents]").val(editor.getValue());
+	});*/
+
+});
+
+</script>
+</body>
 
 
-{% if show_dirs %}
-<div id=dirs class=box><ul>
-  {% if base_dir != "." %}
-	<li>
-		<a class=name href="{{ url_for("show", dirname=parent_path) }}">..</a>
-		<a class=action>&nbsp;</a>
-	</li>
-	{% endif %}
-	{% for target, path in dirs %}
-	<li>
-		<a class=name href="{{ url_for("show", dirname=path) }}">{{ target }}</a>
-		<a class=action href="{{ url_for("delete", target=path) }}">delete</a>
-	</li>
-	{% endfor %}
-</ul></div>
-{% endif %}
-<br />
-
+{#
 
 {% if show_files and files %}
 <div id=files class=box>
@@ -99,7 +249,7 @@
 					type: "GET",
 					url: "{{ url_for('get_raw_file', target=path) }}",
 					error: function() {
-						alert("error getting raw file contents... DO NOT SAVE (@todo)");
+						show_message("error getting raw file contents... DO NOT SAVE (@todo)", true);
 					},
 					success: function(ret, url) {
 						$("form[name=editor] input[name=contents]").val(ret);
@@ -108,18 +258,17 @@
 					}
 				});
 
-				$("form[name=editor] input[name=what]").click(function(ev) {
-						$("form[name=editor] input[name=contents]").val(editor.getValue());
-						//ev.preventDefault();
-					  //alert($("form[name=editor] input[name=contents]").val());
-				});
+
+
 
 			});
+
 	  </script>
 	{% endif %}
 {% endfor %}
 </ul>
 </div>
 {% endif %}
+#}
 
-</body>
+

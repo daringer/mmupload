@@ -1,17 +1,15 @@
 """
-(A) use directly by passing a password as the first argument:
+Provide 'mmupload.yaml' as first argument to create proper password hash:
 
-    $ python gen_pass.py mysecretpass
+    $ python gen_pass.py /path/to/my/mmupload.yaml
 
-(B) use via a password protected entry,
-    by not passing any argument.
+Resulting password hash is to be used inside the mmupload config files for the
+key: 'pwd' authenticating the login provided by the key: 'user'.
 """
 
 import sys
 import getpass
 import hashlib
-
-
 
 def make_pass(pwd):
     import mmupload

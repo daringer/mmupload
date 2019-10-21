@@ -1,3 +1,9 @@
 [submodule "ace"]
 	path = static/ace
 	url = https://github.com/ajaxorg/ace-builds.git
+[submodule "static/jsgrid"]
+	path = static/jsgrid
+	url = https://github.com/tabalinas/jsgrid.git
+[submodule "mmpy"]
+	path = mmpy
+	url = git@github.com:daringer/mmpy_snips.git

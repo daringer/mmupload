@@ -1,8 +1,19 @@
+"""
+Management of the actual files on the filesystem level.
+
+- By providing `root_dir` during construction the resulting instance will try
+  to make sure non (intentionally) invalid path is being processed and/or
+  handled in any ways.
+
+-
+
+"""
+
 import os
 import sys
 import re
 
-class FileDBError(Exception): pass
+class FileDBError(OSError): pass
 class InvalidName(FileDBError): pass
 class InvalidPath(FileDBError): pass
 class DirAlreadyExists(FileDBError): pass
@@ -11,6 +22,7 @@ class DirNotExisting(FileDBError): pass
 class FileNotExisting(FileDBError): pass
 class DirNotEmpty(FileDBError): pass
 class NotDeletingRootDir(FileDBError): pass
+class NotMovingRootDir(FileDBError): pass
 class NotAFileError(FileDBError): pass
 
 class FileDB:
@@ -46,7 +58,11 @@ class FileDB:
 
     def get_size(self, rel_path):
         if self.isdir(rel_path):
-            raise NotImplementedError("directory size for: {rel_path}")
+            #raise NotImplementedError(f"directory size for: {rel_path}")
+            return sum(os.path.getsize(os.path.join(dpath, fn))
+              for dpath, dirs, files in os.walk(self.get_path(rel_path))
+              for fn in files)
+
         elif self.isfile(rel_path):
             return os.path.getsize(self.get_path(rel_path))
         raise FileDBError("unknown item passed to get_size())")
@@ -56,6 +72,17 @@ class FileDB:
 
     def isfile(self, rel_path):
         return os.path.isfile(self.get_path(rel_path))
+
+    def isroot(self, path):
+        return os.path.abspath(self.root_dir) \
+                == os.path.abspath(self.get_path(path))
+
+    def move_path(self, old_path, new_path):
+        """rename/move `old_path` to `new_path`, os.rename() is very careful"""
+        if self.isroot(old_path) or self.isroot(new_path):
+            raise NotMovingRootDir((old_path, new_path))
+
+        os.rename(self.get_path(old_path), self.get_path(new_path))
 
     def create_dir(self, dirname, new_dir):
         if not self.name_pat.match(new_dir):
@@ -97,7 +124,7 @@ class FileDB:
             raise DirNotExisting(dirname)
         if len(self.get_contents(dirname)) > 0:
             raise DirNotEmpty(self.get_path(dirname))
-        if os.path.abspath(self.root_dir) == os.path.abspath(self.get_path(dirname)):
+        if self.isroot(dirname):
             raise NotDeletingRootDir()
         return os.rmdir(self.get_path(dirname))
 
