@@ -1,0 +1,10 @@
+Add bugs/todos here (change order for priority)
+
+- handle browser reload
+- add editor function again
+- thumbnails for images
+- preview for images
+- file sizes human readable
+- 
+-
+- 
