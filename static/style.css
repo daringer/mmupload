@@ -51,8 +51,8 @@ label {
 
 #flash {
     position: fixed;
-    left: 40%;
-    top: 3px;
+    left: 10px;
+    bottom: 10px;
 		padding: 0;
 		border: 0;
 		background-color: unset;
