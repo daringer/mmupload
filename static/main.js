@@ -63,7 +63,7 @@ function update_active_directory(target) {
 		$(l).text("current path: ");
 		$("#curpath").append(l);
 
-		var prepath = "/dir";
+		var prepath = url_prefix + "/dir";
 
 		if (target != ".")
 			var toks = target.split("/");
