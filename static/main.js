@@ -128,7 +128,7 @@ function update_grid(grid_id, target, history_skip=false) {
 				ret.forEach(x => $("#" + grid_id).jsGrid("insertItem", x) );
 
 				if (grid_id == "files") {
-					el = document.createElement("a");
+					var el = document.createElement("a");
 					$(el).text("edit").attr("href", "#").click(function(ev) {
 						alert("kciked edit");
 						ev.preventDefault();
