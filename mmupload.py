@@ -115,9 +115,6 @@ def get_static(target=""):
 @requires_auth
 def create(dirname=""):
     try:
-        print(list(request.form.keys()))
-        print(list(request.form.values()))
-
         if request.form.get("what") == "create" and \
           len(request.form.get("new_dirname").strip()) > 0:
             new_dirname = request.form.get("new_dirname")
