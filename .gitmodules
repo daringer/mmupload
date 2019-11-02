@@ -6,4 +6,4 @@
 	url = https://github.com/tabalinas/jsgrid.git
 [submodule "mmpy"]
 	path = mmpy
-	url = git@github.com:daringer/mmpy_snips.git
+	url = https://github.com/daringer/mmpy_snips.git
