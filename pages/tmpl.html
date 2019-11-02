@@ -196,6 +196,8 @@ $(function() {
 				ret.msgs.forEach(show_message);
 				update_grid("dirs", ret.dirname);
 				update_active_directory(ret.dirname);
+
+				// clear input text field for directory
 				$("form[name=newdir] input[type=text]").val("");
 			}
 		});
@@ -204,7 +206,11 @@ $(function() {
 	$("#upload").ajaxForm(function(ret) {
   	show_message("file uploaded successfully");
 		update_grid("files", current_dir);
+		
+		// clear upload file name field
+		$("form[name=upload] input[type=file]").val("");
   });
+	
 
 	//var editor = ace.edit("editor");
   //editor.setTheme("ace/theme/twilight");
