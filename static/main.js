@@ -127,7 +127,8 @@ function update_grid(grid_id, target, history_skip=false) {
 
 				ret.forEach(x => $("#" + grid_id).jsGrid("insertItem", x) );
 
-				$("#dirs table tbody tr:first td:last").text("");
+				if ($("#dirs table tbody tr:first td:first").text() == "..")
+					$("#dirs table tbody tr:first td:last").text("");
 
 				/*if (grid_id == "files") {
 					var el = document.createElement("a");
