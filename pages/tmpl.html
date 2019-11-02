@@ -49,7 +49,7 @@
 	<article>
 		<div id=files class=toplvlbox></div>
 	</article>
-	
+
 	<article>
 		<div id=dirs class=toplvlbox></div>
 	</article>
@@ -62,6 +62,7 @@
 				  	  action="{{ url_for("create", dirname=base_dir) }}" name=upload>
 				  <label>upload file: </label>
 				  <input type=file name=target />
+					<input type=hidden name=what value=upload />
 				  <input type=submit value=upload name=what />
 			  </form>
 		  </div>
@@ -205,8 +206,8 @@ $(function() {
 		update_grid("files", current_dir);
   });
 
-	var editor = ace.edit("editor");
-  editor.setTheme("ace/theme/twilight");
+	//var editor = ace.edit("editor");
+  //editor.setTheme("ace/theme/twilight");
   //editor.session.setMode("ace/mode/javascript");
 
 	/*$("form[name=editor] input[name=what]").click(function(ev) {
