@@ -45,27 +45,6 @@
 
 <main>
 
-	<aside>
-		<div id=upload class=toplvlbox>
-			<form method=POST enctype=multipart/form-data method="post"
-					  action="{{ url_for("create", dirname=base_dir) }}" name=upload>
-				<label>upload file: </label>
-				<input type=file name=target />
-				<input type=submit value=upload name=what />
-			</form>
-		</div>
-	</aside>
-
-	<aside>
-		<div id=newdir class=toplvlbox>
-		<form method=POST action="{{ url_for("create", dirname=base_dir) }}"
-					name=newdir method=post>
-			<label>new directory: </label>
-			<input type=text name=new_dirname value=""/>
-			<input type=submit value=create name=what />
-		</form>
-		</div>
-	</aside>
 
 	<article>
 		<div id=dirs class=toplvlbox></div>
@@ -74,6 +53,30 @@
 	<article>
 		<div id=files class=toplvlbox></div>
 	</article>
+
+	<aside>
+		<div id=tools class=toplvlbox>
+
+ 		  <div id=upload class=sublvlbox>
+ 			  <form method=POST enctype=multipart/form-data method="post"
+				  	  action="{{ url_for("create", dirname=base_dir) }}" name=upload>
+				  <label>upload file: </label>
+				  <input type=file name=target />
+				  <input type=submit value=upload name=what />
+			  </form>
+		  </div>
+
+		  <div id=newdir class=sublvlbox>
+		  <form method=POST action="{{ url_for("create", dirname=base_dir) }}"
+			  		name=newdir method=post>
+			  <label>new directory: </label>
+			  <input type=text name=new_dirname value=""/>
+			  <input type=submit value=create name=what />
+		  </form>
+		  </div>
+
+		</div>
+	</aside>
 
 </main>
 
@@ -154,7 +157,7 @@ var file_grid = $("#files").jsGrid({
 							type: "POST",
 							data: { new_target: args.item.name },
 							url: args.item.move_url,
-							error: function() { show_message("error moving", true); },
+							error: function() { show_error("error moving"); },
 							success: function(ret) { show_message(ret["msg"]); }
 						});
 		},
@@ -164,7 +167,7 @@ var file_grid = $("#files").jsGrid({
 				type: "POST",
 				url: args.item.delete_url,
 				error: function() {
-					show_message("error deleting path", true);
+					show_error("error deleting path");
 				},
 				success: function(ret) {
 					show_message(ret["msg"]);

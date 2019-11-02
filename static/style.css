@@ -6,7 +6,8 @@ body {
 	overflow: hidden;
 }
 
-input, input[type=submit], input[type=text], input[type=file], input[type=submit], input[type=number] {
+input, input[type=submit], input[type=text], input[type=file],
+input[type=submit], input[type=number], input[type=button] {
   font-size: 0.9em;
 	border: 1px solid #7a7a7a;
   background-color: #c4c4c5;
@@ -24,10 +25,19 @@ label {
   text-align: left;
 }
 
-#upload, #newdir, #files, #dirs, #curpath {
+#files, #dirs, #curpath, #tools {
 	width: 90%;
   margin-left: auto ;
   margin-right: auto ;
+}
+
+#tools {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.sublvlbox {
+	margin-right: auto;
 }
 
 .toplvlbox {
