@@ -5,6 +5,6 @@ Add bugs/todos here (change order for priority)
 - thumbnails for images
 - preview for images
 - file sizes human readable
-- 
--
+- (mobile) pull to reload 
+- (mobile) resize
 - 
