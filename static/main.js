@@ -14,7 +14,7 @@ window.addEventListener("popstate", function(ev) {
 		var args = action.slice(1);
 		func(...args);
 
-		$('.addedMenuNavBarItem').remove();
+		$(".addedMenuNavBarItem").remove();
 		console.log("executing 'back' history: func(...args)");
 	} else {
 		window.history.back();
@@ -39,7 +39,7 @@ function show_error(msg) {
 function show_editor(path) {
 		$.ajax({
 			type: "GET",
-			url: "/get/raw" + path,
+			url: url_prefix + "/get/raw" + path,
 			error: function(ret) { show_error(ret.msg); },
 			success: function(ret) {
 				$("form[name=editor] input[name=contents]").val(ret);
@@ -102,7 +102,7 @@ function update_grid(grid_id, target, history_skip=false) {
 	if (grid_id == "dirs")
 			update_active_directory(target);
 
-	var myurl = "/list/" + grid_id + "/" + target;
+	var myurl = url_prefix + "/list/" + grid_id + "/" + target;
 
 	$.ajax({
 		type: "GET",

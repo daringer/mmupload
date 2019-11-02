@@ -20,6 +20,7 @@ from file_db import FileDB, FileDBError
 
 from gen_pass import make_pass
 
+URL_PREFIX = "/mmupload"
 
 def load_config(config_path):
     """load config in given 'config_path', on any error fail critical & exit!"""
@@ -69,7 +70,8 @@ def render_page(dirname, msgs=None, editor_target=None):
         parent_path="" if dirname == "" else parent,
         base_dir=dirname if dirname != "" else ".",
         base_dir_name=os.path.basename(dirname if dirname != "" else "."),
-        messages=msgs if msgs is not None else []
+        messages=msgs if msgs is not None else [],
+        url_prefix=URL_PREFIX
     )
 
 def check_auth_global(username, password):
@@ -302,4 +304,5 @@ def get_file_short(target):
 
 
 if __name__ == "__main__":
+    URL_PREFIX = ""
     app.run(host='0.0.0.0', port=5001, debug=True)
