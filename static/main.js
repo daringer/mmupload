@@ -36,8 +36,20 @@ function show_error(msg) {
 		show_message(msg, true);
 }
 
-function show_preview(path) {
 
+function readable_size(size) {
+	var unit_idx = 0;
+	var units = {0: "B", 1: "KB", 2: "MB", 3: "GB"};
+	var out_size = size;
+	while (out_size > 1024 || unit_idx == 0) {
+		out_size = out_size / 1024.;
+	  unit_idx++;
+	}
+	return out_size.toFixed(3) + " " + units[unit_idx];
+}
+
+function show_preview(path) {
+		
 
 }
 
@@ -130,6 +142,13 @@ function update_grid(grid_id, target, history_skip=false) {
 						{"name": "..", "path": parent_url});
 				}
 
+				// update size
+			  ret = ret.map(x => { 
+					x.size = readable_size(x.size); 
+					return x;
+				});
+
+				// insert to jsgrid
 				ret.forEach(x => $("#" + grid_id).jsGrid("insertItem", x) );
 
 				if ($("#dirs table tbody tr:first td:first").text() == "..")
