@@ -11,6 +11,14 @@ Add bugs/todos here (change order for priority)
 	- preview: add new col and icon and preview 
 	- edit contents: add new col and icon 
 
+- make files public
+
+- make shortened url for any file
+	- url-shortening outsourcing to micro-rest-service!?
+
+- allow usage as pastebin
+
+
 
 
 DONE:
