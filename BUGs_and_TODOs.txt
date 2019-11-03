@@ -4,12 +4,15 @@ Add bugs/todos here (change order for priority)
 - add editor function again
 - thumbnails for images
 - preview for images
-- file sizes human readable
 - (mobile) pull to reload  -> https://github.com/BoxFactura/pulltorefresh.js
 - (mobile) resize
-- icons on the right:
-	- preview 
-	- edit (ace editor)
-	- move 
-	- delete
-	
+- control:
+	- keep edit + delete, but update icons
+	- preview: add new col and icon and preview 
+	- edit contents: add new col and icon 
+
+
+
+DONE:
+
+- file sizes human readable
