@@ -92,11 +92,12 @@ var dir_grid = $("#dirs").jsGrid({
 
     fields: [
         { name: "name", title: "Directory Name", type: "text", width: 150 },
-        { name: "path", type: "text", visible: false},
+     		{ name: "path", type: "text", visible: false},
+				{ name: "mimetype", type: "text", visible: false},
         { name: "move_url", type: "text", visible: false},
         { name: "delete_url", type: "text", visible: false},
         { name: "click_url", type: "text", visible: false},
-        { name: "size", title: "Tree Size", type: "number", align: "left" },
+        { name: "size", title: "Tree Size", type: "number", align: "left", readOnly: true},
         { type: "control", width: 20 }
     ],
 
@@ -114,6 +115,7 @@ var dir_grid = $("#dirs").jsGrid({
 							error: function() { show_message("error moving", true); },
 							success: function(ret) {
 								show_message(ret["msg"]);
+								update_grid("dirs", current_dir, true);
 							}
 						})
 		},
@@ -142,10 +144,11 @@ var file_grid = $("#files").jsGrid({
     fields: [
         { name: "name", title: "Name", type: "text", width: 150 },
         { name: "path", type: "text", visible: false},
+				{ name: "mimetype", type: "text", visible: false},
         { name: "move_url", type: "text", visible: false},
         { name: "delete_url", type: "text", visible: false},
         { name: "click_url", type: "text", visible: false},
-        { name: "size", title: "Size", type: "number", align: "left" },
+        { name: "size", title: "Size", type: "number", align: "left", readOnly: true},
         { type: "control", width: 20 }
     ],
     rowClick: function(args) {
@@ -159,7 +162,10 @@ var file_grid = $("#files").jsGrid({
 							data: { new_target: args.item.name },
 							url: args.item.move_url,
 							error: function() { show_error("error moving"); },
-							success: function(ret) { show_message(ret["msg"]); }
+							success: function(ret) {
+								show_message(ret["msg"]);
+								update_grid("files", current_dir, true);
+							}
 						});
 		},
 		// before deletion is done in grid
@@ -206,11 +212,11 @@ $(function() {
 	$("#upload").ajaxForm(function(ret) {
   	show_message("file uploaded successfully");
 		update_grid("files", current_dir);
-		
+
 		// clear upload file name field
 		$("form[name=upload] input[type=file]").val("");
   });
-	
+
 
 	//var editor = ace.edit("editor");
   //editor.setTheme("ace/theme/twilight");

@@ -36,6 +36,11 @@ function show_error(msg) {
 		show_message(msg, true);
 }
 
+function show_preview(path) {
+
+
+}
+
 function show_editor(path) {
 		$.ajax({
 			type: "GET",

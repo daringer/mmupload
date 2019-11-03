@@ -153,9 +153,11 @@ def ls(what, dirname=""):
         filedb.get_dirs(dirname) if what == "dirs" else \
         filedb.get_files(dirname))
 
+    get_mime = lambda tar: mimetypes.guess_type(filedb.get_path(tar))[0]
     data = list(map(lambda dct: {
           "name": dct["name"],
           "path": dct["path"],
+          "mimetype": get_mime(dct["path"]),
           "size": filedb.get_size(dct["path"]),
           "delete_url": url_for("delete", target=dct["path"]),
           "move_url": url_for("move", target=dct["path"]),
