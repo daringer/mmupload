@@ -17,46 +17,19 @@ from urllib.parse import quote, urlparse
 import yaml
 
 from file_db import FileDB, FileDBError
-
+from utils import load_config
 from gen_pass import make_pass
 
 URL_PREFIX = "/mmupload"
+YAML_CFG_PATH = sys.argv[1]
 
-def load_config(config_path):
-    """load config in given 'config_path', on any error fail critical & exit!"""
-    if not os.path.exists(config_path):
-        print("config path: {config_path} not found, exiting...")
-        sys.exit(1)
-    cfg = yaml.safe_load(open(config_path))
-
-    if "file_destination" not in cfg:
-        print("you must set 'file_destintion' to a writable path (dir), exiting...")
-        sys.exit(1)
-
-    if not os.path.exists(cfg["file_destination"]) \
-      or not os.path.isdir(cfg["file_destination"]):
-        print ("your 'file_destination' is not existing or not r/w/x + (dir)")
-        # @todo: writeable check missing...
-        sys.exit(1)
-
-    if not "secret_key" in cfg:
-        print ("'secret_key' missing in configuration, exiting...")
-        sys.exit(1)
-
-    if not "user" in cfg or not "pwd" in cfg:
-        print ("no 'user' and 'pwd' provided in configuration, exiting...")
-        sys.exit(1)
-
-    return cfg
-
-cfg = load_config(sys.argv[1])
+cfg = load_config(YAML_CFG_PATH)
 
 app = Flask(__name__)
 app.secret_key = cfg["secret_key"]
 app.register_blueprint(main, url_prefix="/")
 
-filedb = FileDB(cfg["file_destination"])
-
+filedb = FileDB(cfg["file_destination"], YAML_CFG_PATH)
 
 ####
 #### utils
@@ -149,7 +122,11 @@ def show(dirname=""):
 @app.route("/list/<string:what>/<path:dirname>")
 @requires_auth
 def ls(what, dirname=""):
-    raw_list = map(lambda p: {"name": p, "path": os.path.join(dirname, p)},
+    raw_list = map(lambda p: {
+            "name": p,
+            "path": os.path.join(dirname, p),
+            "meta": filedb.get_meta_from_yaml(os.path.join(dirname, p))
+        },
         filedb.get_dirs(dirname) if what == "dirs" else \
         filedb.get_files(dirname))
 
@@ -159,6 +136,8 @@ def ls(what, dirname=""):
           "path": dct["path"],
           "mimetype": get_mime(dct["path"]),
           "size": filedb.get_size(dct["path"]),
+          #"zones": ",".join(z[0] for z in dct["meta"].get("zones")),
+          "short": dct["meta"].get("short"),
           "delete_url": url_for("delete", target=dct["path"]),
           "move_url": url_for("move", target=dct["path"]),
           "click_url": url_for("ls", what=what, dirname=dct["path"]) \
@@ -176,13 +155,25 @@ def edit(target):
 @app.route("/move/<path:target>", methods=["POST"])
 @requires_auth
 def move(target):
+
     old_parent = os.path.dirname(target)
     new_target = os.path.join(old_parent, request.form.get("new_target"))
     try:
         filedb.move_path(target, new_target)
+        filedb.update_path_in_yaml(target, new_target)
     except OSError as e:
         return jsonify({"msg": repr(e), "state": "fail"})
-    return jsonify({"msg": f"'{target}' moved to '{new_target}'", "state": "ok"})
+
+    new_short = request.form.get("new_short")
+    if filedb.get_meta_from_yaml(new_target).get("short", "") != new_short:
+        ret = filedb.update_meta_in_yaml(new_target, new_short)
+        shortinfo = f"new short: '{new_short}' already taken!" \
+                if not ret else \
+            (f"new short: '{new_short}'" if new_short != "" else \
+             "[REMOVED SHORT]")
+
+    return jsonify({"msg": f"'{target}' moved to '{new_target}'{shortinfo}",
+                    "state": "ok"})
 
 @app.route("/del/<path:target>", methods=["POST"])
 @requires_auth
@@ -217,56 +208,19 @@ def file_get_helper(target, raw=False):
 
 #@app.route("/s/<zone>/<s_id>", methods=["POST", "GET", "DELETE"])
 #@app.route("/s/<zone>", methods=["POST", "DELETE"])
-@app.route("/s/x/<s_id>",   methods=["GET"])
-@app.route("/s/x",          methods=["POST", "DELETE"])
-@requires_zone_auth
-def safe_shorties(zone, s_id=None):
-    return shorties(zone, s_id)
+#@app.route("/s/x/<s_id>",   methods=["GET"])
+#@app.route("/s/x",          methods=["POST", "DELETE"])
+#@requires_zone_auth
+#def safe_shorties(zone, s_id=None):
+#    return shorties(zone, s_id)
 
-@app.route("/s/pub/<s_id>", methods=["GET"])
-@app.route("/s/pub",        methods=["POST", "DELETE"])
-def shorties(zone, s_id=None):
-    if request.method == "POST":
-
-        new_shorty = request.form.get("new_shorty").strip()
-
-        if not filedb.name_pat.match(new_shorty):
-            flash("illegal shorty, need {filedb.raw_name_pat} (minus slash '/')")
-
-        elif "/" in new_shorty:
-            flash("no slashes allowed inside shorties")
-
-        elif new_shorty in cfg["shorties"][zone]:
-            flash("shorty already exists, please try another one")
-
-        elif zone in cfg["shorties"] and len(new_shorty) > 4:
-            #shorty_url = "/s/{zone}/{new_shorty}"
-            shorty_url = url_for("shorties",  zone=zone, s_id=new_shorty)
-            flash("shorty created, url: {shorty_url}")
-            cfg["shorties"][zone][new_shorty] = target
-            ########################
-            # @TODO: database is dirty, need save!(!)
-            ########################
-
-    elif request.method == "DELETE":
-        s_id = request.form.get("old_shorty")
-        if zone in cfg["shorties"] and s_id in cfg["shorties"][zone]:
-            del cfg["shorties"][zone][s_id]
-            flash("removed shorty: {s_id} in zone: {zone}")
-            ########################
-            # @TODO: database is dirty, need save!(!)
-            ########################
-            ########################
-            ########################
-    else:
-        # path is always relative! no abs-paths inside the DB
-        path = cfg["shorties"].get(zone, {}).get(s_id)
-        if not path:
-            flash("invalid")
-            # @TODO @TODO
-            # @TODO: return redirect() <- to a 404 error page"
-            # @TODO @TODO
-            return file_get_helper(path)
+@app.route("/s/<s_id>", methods=["GET"])
+#@app.route("/s/",       methods=["POST", "DELETE"])
+def shorties(s_id):
+    rel_path = filedb.get_short_from_yaml(s_id)
+    if not rel_path:
+        return show()
+    return file_get_helper(rel_path)
 
 
 ############

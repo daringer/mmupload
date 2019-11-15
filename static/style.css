@@ -36,6 +36,10 @@ label {
 	flex-wrap: wrap;
 }
 
+.not_public {
+	color: #9a9a9a;
+}
+
 .sublvlbox {
 	margin-right: auto;
 }

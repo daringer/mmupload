@@ -13,6 +13,8 @@ import os
 import sys
 import re
 
+from utils import load_config, save_config
+
 class FileDBError(OSError): pass
 class InvalidName(FileDBError): pass
 class InvalidPath(FileDBError): pass
@@ -30,8 +32,50 @@ class FileDB:
     raw_name_pat = "^[a-zA-Z0-9-_/]+$"
     name_pat = re.compile(raw_name_pat)
 
-    def __init__(self, root_dir):
+    def __init__(self, root_dir, yaml_cfg_path):
         self.root_dir = root_dir
+        self.yaml_cfg_path = yaml_cfg_path
+
+    def update_meta_in_yaml(self, rel_path, short, zones=None):
+        cfg = load_config(self.yaml_cfg_path)
+
+        all_shorts = [v["short"] for p, v in cfg.get("paths", {}).items() \
+                      if "short" in v]
+        cfg.setdefault("paths", {}).setdefault(rel_path, {})["short"] = \
+                short if short != "" else None
+
+        if short not in all_shorts:
+            save_config(cfg, self.yaml_cfg_path)
+            return True
+        return False
+
+    def update_path_in_yaml(self, old_rel_path, new_rel_path):
+        cfg = load_config(self.yaml_cfg_path)
+        if old_rel_path in cfg.setdefault("paths", {}):
+            del cfg.setdefault("paths", {})[old_rel_path]
+            cfg.setdefault("paths", {})[new_rel_path] = {}
+        save_config(cfg, self.yaml_cfg_path)
+
+    def get_short_from_yaml(self, short_id):
+        cfg = load_config(self.yaml_cfg_path)
+        res = [k for k, v in cfg.get("paths", {}).items() \
+            if v.get("short") == short_id]
+        if len(res) == 1:
+            return res[0]
+        return None
+
+    def get_meta_from_yaml(self, rel_path):
+        cfg = load_config(self.yaml_cfg_path)
+
+        zones = cfg.get("zones", {})
+
+        file_info = cfg.get("paths", {}).get(rel_path)
+        if file_info is None:
+            return {}
+        return {
+            "short": file_info.get("short"),
+            "zones": [(z, zones.get(z)) for z in file_info.get("zones", [])]
+        }
 
     def get_contents(self, dirname=""):
         if dirname != "":

@@ -102,8 +102,8 @@ var dir_grid = $("#dirs").jsGrid({
     ],
 
     rowClick: function(args) {
-			update_grid("dirs", args.item.path);
-			update_grid("files", args.item.path, true);
+				update_grid("dirs", args.item.path);
+				update_grid("files", args.item.path, true);
 		},
 		// before updating is done in grid
 		onItemUpdating: function(args) {
@@ -144,6 +144,8 @@ var file_grid = $("#files").jsGrid({
     fields: [
         { name: "name", title: "Name", type: "text", width: 150 },
         { name: "path", type: "text", visible: false},
+        { name: "short", title: "Public short-url", type: "text"},
+        /* { name: "zones", type: "text", visible: false}, */
 				{ name: "mimetype", type: "text", visible: false},
         { name: "move_url", type: "text", visible: false},
         { name: "delete_url", type: "text", visible: false},
@@ -154,12 +156,13 @@ var file_grid = $("#files").jsGrid({
     rowClick: function(args) {
 				window.location = args.item.click_url;
 		},
+
 		// before updating is done in grid
 		onItemUpdating: function(args) {
 				if (args.item.name != "")
 						$.ajax({
 							type: "POST",
-							data: { new_target: args.item.name },
+							data: { new_target: args.item.name, new_short: args.item.short },
 							url: args.item.move_url,
 							error: function() { show_error("error moving"); },
 							success: function(ret) {
@@ -273,10 +276,6 @@ $(function() {
 						editor.clearSelection();
 					}
 				});
-
-
-
-
 			});
 
 	  </script>
