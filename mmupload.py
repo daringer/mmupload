@@ -20,11 +20,16 @@ from file_db import FileDB, FileDBError
 from utils import load_config
 from gen_pass import make_pass
 
-URL_PREFIX = "/mmupload"
+# where to find the .yaml config file
 YAML_CFG_PATH = sys.argv[1]
-
 cfg = load_config(YAML_CFG_PATH)
 
+# global url prefix, if mmupload is located in a sub-directory
+URL_PREFIX = cfg.get("url_prefix", "/")
+if URL_PREFIX == "/":
+    URL_PREFIX = ""
+
+# flask init
 app = Flask(__name__)
 app.secret_key = cfg["secret_key"]
 app.register_blueprint(main, url_prefix="/")
