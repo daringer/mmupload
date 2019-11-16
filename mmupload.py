@@ -13,6 +13,7 @@ from werkzeug.utils import secure_filename
 main = Blueprint("main", __name__, template_folder="pages")
 
 from urllib.parse import quote, urlparse
+from uuid import uuid4 as create_uid
 
 import yaml
 
@@ -40,9 +41,9 @@ filedb = FileDB(cfg["file_destination"], YAML_CFG_PATH)
 #### utils
 ####
 
-def render_page(dirname, msgs=None, editor_target=None):
+def render_page(dirname, msgs=None, editor_target=None, tmpl="tmpl.html"):
     parent = os.path.dirname(dirname)
-    return render_template("tmpl.html",
+    return render_template(tmpl,
         editor_target=editor_target,
         parent_dir="" if dirname == "" else os.path.basename(parent),
         parent_path="" if dirname == "" else parent,
@@ -121,7 +122,10 @@ def create(dirname=""):
 @app.route("/dir/<path:dirname>")
 @requires_auth
 def show(dirname=""):
-    return render_page(dirname)
+    #return render_page(dirname, msgs=[request.args.get("msg")])
+    print (list(request.args), request.args.get("msg"))
+    return render_page(dirname, msgs=[request.args.get("msg")])
+
 
 @app.route("/list/<string:what>/")
 @app.route("/list/<string:what>/<path:dirname>")
@@ -224,9 +228,31 @@ def file_get_helper(target, raw=False):
 def shorties(s_id):
     rel_path = filedb.get_short_from_yaml(s_id)
     if not rel_path:
-        return show()
+        return jsonify({"msg": f"invalid request", "state": "fail"})
     return file_get_helper(rel_path)
 
+@app.route("/pastebin", methods=["GET", "POST"])
+def pastebin():
+    targetdir = "pastebin"
+    if request.method == "POST":
+        if not filedb.isdir(targetdir):
+            filedb.create_dir("", targetdir)
+        uid = str(create_uid())[:8]
+        while uid in filedb.get_contents(targetdir):
+            uid = str(create_uid())[:8]
+        paste_data = request.form.get("data")
+        path = filedb.create_raw_file(targetdir, uid, paste_data)
+        url = os.path.join(URL_PREFIX, "pastebin", uid)
+
+        filedb.update_meta_in_yaml(os.path.join("pastebin", uid), uid)
+
+        my_msg = f"saved pasted data, url: {url}"
+        if request.form.get("paste_from") == "editor":
+            return redirect(url_for("show", dirname="pastebin", msg=my_msg))
+        else:
+            return jsonify({"msg": my_msg, "state": "ok"})
+    else:
+        return render_page("", tmpl="pastebin.html")
 
 ############
 ## just write / load database

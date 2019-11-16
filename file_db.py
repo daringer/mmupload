@@ -5,8 +5,6 @@ Management of the actual files on the filesystem level.
   to make sure non (intentionally) invalid path is being processed and/or
   handled in any ways.
 
--
-
 """
 
 import os
@@ -36,6 +34,7 @@ class FileDB:
         self.root_dir = root_dir
         self.yaml_cfg_path = yaml_cfg_path
 
+    ### YAML - config related
     def update_meta_in_yaml(self, rel_path, short, zones=None):
         cfg = load_config(self.yaml_cfg_path)
 
@@ -76,6 +75,8 @@ class FileDB:
             "short": file_info.get("short"),
             "zones": [(z, zones.get(z)) for z in file_info.get("zones", [])]
         }
+
+    ################################
 
     def get_contents(self, dirname=""):
         if dirname != "":
@@ -144,6 +145,19 @@ class FileDB:
         with open(path, "w") as fd:
             fd.write(contents)
 
+        return path
+
+    def create_raw_file(self, dirname, filename, raw_data):
+        target = os.path.join(dirname, filename)
+        if target in self.get_contents(dirname):
+            raise FileAlreadyExists(target)
+
+        path = self.get_path(target)
+        if self.isdir(path) or self.isfile(path):
+            raise FileAlreadyExists(target)
+
+        with open(path, "w") as fd:
+            fd.write(raw_data)
         return path
 
     def create_file(self, dirname, data):

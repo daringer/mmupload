@@ -11,6 +11,8 @@
 		type="text/javascript" charset="utf-8"></script>
 	<script src="{{ url_for("get_static", target="jsgrid/dist/jsgrid.min.js") }}"
 		type="text/javascript" charset="utf-8"></script>
+	<script src="{{ url_for("get_static", target="ace/src-min/ace.js") }}"
+		type="text/javascript" charset="utf-8"></script>
 
 	<link rel="stylesheet" href="{{ url_for("get_static",
 											target="jsgrid/dist/jsgrid-theme.min.css") }}" />
@@ -33,7 +35,7 @@
 
 		$(function() {
 			{% for msg in messages %}
-				show_message("{{msg}}"):
+				show_message("{{msg}}");
 			{% endfor %}
 		});
 </script>
@@ -46,12 +48,13 @@
 </header>
 
 <main>
-	<article>
-		<div id=files class=toplvlbox></div>
-	</article>
 
 	<article>
 		<div id=dirs class=toplvlbox></div>
+	</article>
+
+	<article>
+		<div id=files class=toplvlbox></div>
 	</article>
 
 	<aside>
@@ -69,15 +72,22 @@
 
 		  <div id=newdir class=sublvlbox>
 		  <form method=POST action="{{ url_for("create", dirname=base_dir) }}"
-			  		name=newdir method=post>
+			  		name=newdir>
 			  <label>new directory: </label>
 			  <input type=text name=new_dirname value=""/>
 			  <input type=submit value=create name=what />
 		  </form>
 		  </div>
 
+			<div id=pastebinlink class=sublvlbox>
+				<form method=GET action="{{ url_for("pastebin") }}">
+					<input type=submit value="new pastebin" name=what />
+				</form>
+			</div>
+
 		</div>
 	</aside>
+
 
 </main>
 
