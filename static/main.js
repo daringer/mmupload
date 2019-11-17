@@ -49,7 +49,7 @@ function readable_size(size) {
 }
 
 function show_preview(path) {
-		
+
 
 }
 
@@ -109,7 +109,11 @@ function update_active_directory(target) {
 			$("#files").show();
 		} else {
 			$("#upload").hide();
-			$("#files").hide();
+			//$("#files").hide();
+			/*$("#files").attr("width", "10%");
+			$("#files").text("");*/
+
+			//$("#dirs").attr("display", "block");
 		}
 }
 
@@ -143,16 +147,62 @@ function update_grid(grid_id, target, history_skip=false) {
 				}
 
 				// update size
-			  ret = ret.map(x => { 
-					x.size = readable_size(x.size); 
+			  ret = ret.map(x => {
+					x.size = readable_size(x.size);
+					x.name = `<a id="${x.uid}_name" class=uniquelink>${x.name}</a>`;
+					x.ctrl_rename = `<a id="${x.uid}_rename" class=uniquelink>rename</a>`;
+					x.ctrl_delete = `<a id="${x.uid}_delete" class=uniquelink>delete</a>`;
+					x.ctrl_edit = `<a id="${x.uid}_edit" class=uniquelink>edit</a>`;
+					x.ctrl_preview = `<a id="${x.uid}_preview" class=uniquelink>preview</a>`;
 					return x;
 				});
 
-				// insert to jsgrid
-				ret.forEach(x => $("#" + grid_id).jsGrid("insertItem", x) );
+				ret.forEach(x => {
+					$("#" + grid_id).jsGrid("insertItem", x).then(function(e) {
+						$("#" + x.uid + "_name").closest("td").click({x: x, func: update_grid, grid_id: grid_id},
+							function(e) {
+								if (e.data.grid_id == "dirs") {
+									e.data.func("dirs", e.data.x.path);
+									e.data.func("files", e.data.x.path, true);
+								} else {
+									window.location = e.data.x.click_url;
+								}
+						});
+						$("#" + x.uid + "_name").text($(x.name).text());
+						x.name = $(x.name).text();
+						$("#" + x.uid + "_rename").click({x: x, func: update_grid, grid_id: grid_id},
+							function(e) {
+									alert("iodsfj");
+									$("#" + e.data.grid_id).jsGrid("editItem", x);
+							}
+						);
 
-				if ($("#dirs table tbody tr:first td:first").text() == "..")
+						$("#" + x.uid + "_delete").click({x: x, func: update_grid, grid_id: grid_id},
+							function(e) {
+							$("#" + e.data.grid_id).jsGrid("deleteItem", x);
+						});
+						$("#" + x.uid + "_edit").click({x: x, func: update_grid, grid_id: grid_id},
+						function(e) {
+							alert("...");
+						});
+						$("#" + x.uid + "_preview").click({x: x, func: update_grid, grid_id: grid_id},
+							function(e) {
+							alert("...");
+						});
+
+						// insert to jsgrid
+					});
+				});
+
+				if ($("#dirs table tbody tr:first td:first").text() == "..") {
 					$("#dirs table tbody tr:first td:last").text("");
+					$("#dirs table tbody tr:first td:first").click(function(e) {
+						update_grid("files", current_dir.split("/").slice(0, -1).join("/"));
+						update_grid("dirs", current_dir.split("/").slice(0, -1).join("/"));
+					});
+
+				}
+
 
 				/*if (grid_id == "files") {
 					var el = document.createElement("a");

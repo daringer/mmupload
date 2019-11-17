@@ -25,10 +25,40 @@ label {
   text-align: left;
 }
 
+a.uniquelink {
+	margin: 0;
+	padding: 0;
+	text-decoration: unset;
+}
+
 #files, #dirs, #curpath, #tools, #editorbox {
+}
+
+article {
+	margin: 0;
+	padding: 0;
 	width: 90%;
   margin-left: auto ;
   margin-right: auto ;
+	margin-top: 8px;
+}
+
+@media only screen and (max-width: 999px) {
+#files, #dirs, #curpath, #tools, #editorbox {
+	width:100%;
+}
+
+}
+@media only screen and (min-width: 1000px) {
+    #dirs {
+				display: table-cell;
+		    min-width: 150px;
+    }
+		#files {
+				display: table-cell;
+    		width: 100%;
+    		vertical-align: top;
+		}
 }
 
 #tools {
@@ -38,8 +68,6 @@ label {
 
 #editor {
 	height: 500px;
-	margin-top: auto;
-	margin-bottom: auto;
 }
 
 #pastebinlink {
@@ -49,7 +77,6 @@ label {
 #editorbox {
 	background-color: #cccccc;
 	box-shadow:  1px 2px 2px rgba(0, 0, 0, .15);
-	margin-top: 8px;
   line-height: 2.4em;
   padding: 6px;
   border: 1px solid #7a7a7a;
@@ -59,7 +86,6 @@ label {
 	width: 100%;
 	padding: 4px;
 	margin: 0;
-	margin-top: 2px;
 	font-size: 1.1em;
 	font-weight: bold;
 	background-color: #141414;
@@ -67,13 +93,12 @@ label {
 }
 
 .sublvlbox {
-	margin-right: auto;
+	/*margin-right: auto;*/
 }
 
 .toplvlbox {
   background-color: #cccccc;
 	box-shadow:  1px 2px 2px rgba(0, 0, 0, .15);
-	margin-top: 8px;
   line-height: 2.4em;
   padding: 6px;
   border: 1px solid #7a7a7a;
@@ -96,7 +121,6 @@ label {
     background-color: #ab6666;
 		opacity: 0.65;
 		margin-top: 4px;
-		z-index: 1000;
 }
 
 .jsgrid-row, .jsgrid-alt-row, .jsgrid-header-row, .jsgrid-filter-row,

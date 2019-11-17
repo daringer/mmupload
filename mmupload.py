@@ -143,6 +143,7 @@ def ls(what, dirname=""):
     data = list(map(lambda dct: {
           "name": dct["name"],
           "path": dct["path"],
+          "uid": str(create_uid())[:8],
           "mimetype": get_mime(dct["path"]),
           "size": filedb.get_size(dct["path"]),
           #"zones": ",".join(z[0] for z in dct["meta"].get("zones")),

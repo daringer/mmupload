@@ -95,6 +95,8 @@ class FileDB:
                 if self.isfile(os.path.join(dirname, p))]
 
     def get_path(self, rel_path):
+        if rel_path == "/":
+            return ""
         if rel_path.startswith("/"):
             rel_path = os.path.relpath(rel_path, self.root_dir)
         if rel_path.startswith("/") or ".." in rel_path:
