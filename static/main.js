@@ -110,8 +110,8 @@ function update_active_directory(target) {
 		} else {
 			$("#upload").hide();
 			//$("#files").hide();
-			/*$("#files").attr("width", "10%");
-			$("#files").text("");*/
+			/*$("#files").attr("width", "10%");*/
+			//$("#files").text("");
 
 			//$("#dirs").attr("display", "block");
 		}
@@ -149,7 +149,7 @@ function update_grid(grid_id, target, history_skip=false) {
 				// update size
 			  ret = ret.map(x => {
 					x.size = readable_size(x.size);
-					x.name = `<a id="${x.uid}_name" class=uniquelink>${x.name}</a>`;
+					x.name = `<a id="${x.uid}_name" class=uniquelink alt="${x.size}">${x.name}</a>`;
 					x.ctrl_rename = `<a id="${x.uid}_rename" class=uniquelink>rename</a>`;
 					x.ctrl_delete = `<a id="${x.uid}_delete" class=uniquelink>delete</a>`;
 					x.ctrl_edit = `<a id="${x.uid}_edit" class=uniquelink>edit</a>`;
@@ -170,17 +170,17 @@ function update_grid(grid_id, target, history_skip=false) {
 						});
 						$("#" + x.uid + "_name").text($(x.name).text());
 						x.name = $(x.name).text();
+
 						$("#" + x.uid + "_rename").click({x: x, func: update_grid, grid_id: grid_id},
 							function(e) {
-									alert("iodsfj");
 									$("#" + e.data.grid_id).jsGrid("editItem", x);
 							}
 						);
 
 						$("#" + x.uid + "_delete").click({x: x, func: update_grid, grid_id: grid_id},
 							function(e) {
-							$("#" + e.data.grid_id).jsGrid("deleteItem", x);
-						});
+								$("#" + e.data.grid_id).jsGrid("deleteItem", x);
+							});
 						$("#" + x.uid + "_edit").click({x: x, func: update_grid, grid_id: grid_id},
 						function(e) {
 							alert("...");
