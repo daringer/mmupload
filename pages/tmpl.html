@@ -124,7 +124,7 @@ var dir_grid = $("#dirs").jsGrid({
 			{ name: "ctrl_preview", title:"",type: "text",width: 35, readOnly: true, align: "right", editing: false}
 
     ],
-
+		rowClick: function(args) {},
 		// before updating is done in grid
 		onItemUpdating: function(args) {
 				if (args.item.name != "")
@@ -178,6 +178,7 @@ var file_grid = $("#files").jsGrid({
 
     ],
 
+		rowClick: function(args) {},
 		// before updating is done in grid
 		onItemUpdating: function(args) {
 				if (args.item.name != "")
