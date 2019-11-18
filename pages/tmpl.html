@@ -139,6 +139,9 @@ var dir_grid = $("#dirs").jsGrid({
 							}
 						})
 		},
+		onItemEditing: function(args) {
+				args.item.ctrl_rename = "";
+		},
 		// before deletion is done in grid
     onItemDeleting: function(args) {
 			$.ajax({

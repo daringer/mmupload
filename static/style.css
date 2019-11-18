@@ -43,13 +43,13 @@ article {
 	margin-top: 8px;
 }
 
-@media only screen and (max-width: 999px) {
+@media only screen and (max-width: 799px) {
 #files, #dirs, #curpath, #tools, #editorbox {
 	width:100%;
 }
 
 }
-@media only screen and (min-width: 1000px) {
+@media only screen and (min-width: 800px) {
     #dirs {
 				display: table-cell;
 		    min-width: 150px;
