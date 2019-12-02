@@ -29,7 +29,15 @@ function show_message(msg, error=false) {
 			return;
 
 		var el = document.createElement("div");
+	  var ic = document.createElement("img");
+	  $(ic).attr("src", "/local/icons/svg/exclamation.svg");
+	  $(ic).css({
+				position: "relative",
+			  left: "-2px",
+				top: "7px"
+		});
 		$(el).text(msg).attr("class", (error) ? "err" : "info").hide();
+		$(el).prepend(ic);
 		$("#flash").append(el);
 		$(el).fadeIn(1000, function() {
 			$(el).fadeOut(15000, function() {
@@ -172,6 +180,10 @@ function ctrl_action(uid, op) {
 		show_ctrls(uid, ask_modes, primary_modes);
 		uid_editing = uid;
 
+		//$("#" + uid + "_name").closest("tr").attr("background-color", "red");
+		$("#iconbox_" + uid + "_confirm").parent().parent().css("background-color", "#bababc");
+
+
 	} else if (x.active_mode == "delete") {
 		uid_editing = uid;
 
@@ -204,6 +216,7 @@ function ctrl_action(uid, op) {
 			else {
 				$("#" + uid2grid_id[uid]).jsGrid("cancelEdit");
 				show_ctrls(uid, primary_modes, ask_modes);
+				$("#iconbox_" + uid + "_confirm").parent().parent().css("background-color", "unset");
 			}
 			x.last_mode = null;
 

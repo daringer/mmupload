@@ -118,8 +118,12 @@ def create(dirname=""):
 
         elif request.form.get("what") == "upload":
             app.config["UPLOADS_FILES_DEST"] = filedb.get_path(dirname)
-            filename = filedb.create_file(dirname, request.files["target"])
-            msg = f"Saved to: {filename}"
+            req_file = request.files.get("target")
+            if not req_file:
+                msg = f"Something went wrong, no uploaded file found..."
+            else:
+                filename = filedb.create_file(dirname, request.files.get("target"))
+                msg = f"Saved to: {filename}"
 
         elif request.form.get("what") == "save":
             app.config["UPLOADS_FILES_DEST"] = filedb.get_path(dirname)
@@ -252,7 +256,8 @@ def shorties(s_id):
         return jsonify({"msg": f"invalid request", "state": "fail"})
     return file_get_helper(rel_path)
 
-@app.route("/pastebin", methods=["GET", "POST"])
+#@app.route("/pastebin", methods=["GET", "POST"])
+@app.route("/pastebin", methods=["POST"])
 def pastebin():
     targetdir = "pastebin"
     if request.method == "POST":
@@ -272,8 +277,8 @@ def pastebin():
             return redirect(url_for("show", dirname="pastebin", msg=my_msg))
         else:
             return jsonify({"msg": my_msg, "state": "ok"})
-    else:
-        return render_page("", tmpl="pastebin.html")
+    #else:
+    #    return render_page("", tmpl="pastebin.html")
 
 ############
 ## just write / load database

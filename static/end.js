@@ -63,7 +63,7 @@ var dir_grid = $("#dirs").jsGrid({
       { name: "click_url", type: "text", visible: false},
 			{ name: "size", title: "Tree Size", type: "text", align: "left",
 				readOnly: true, editing: false, visible: false},
-  		{ name: "ctrl", title: "", type: "myctrl", grid_id: "dirs", width: 150}
+  		{ name: "ctrl", title: "", type: "myctrl", grid_id: "dirs", width: 160}
     ],
 
 		rowClick: function(args) {},
@@ -121,16 +121,17 @@ var file_grid = $("#files").jsGrid({
 		confirmDeleting: false,
 
     fields: [
-      { name: "name", title: "Name", type: "text", width: 500 },
+      { name: "name", title: "Name", type: "text", width: 300 },
       { name: "path", type: "text", visible: false},
-      { name: "short", title: "Public short-url", type: "text", width: 200},
+      { name: "short", title: "short-url", type: "text", width: 200},
       /* { name: "zones", type: "text", visible: false}, */
 			{ name: "mimetype", type: "text", visible: false},
       { name: "move_url", type: "text", visible: false},
       { name: "delete_url", type: "text", visible: false},
       { name: "click_url", type: "text", visible: false},
-			{ name: "size", title: "Size", type: "text", align: "left", readOnly: true, editing: false},
-  		{ name: "ctrl", title: "", type: "myctrl", grid_id: "files", width: 180}
+			{ name: "size", title: "Size", type: "text", align: "left", width: 250,
+				readOnly: true, editing: false},
+  		{ name: "ctrl", title: "", type: "myctrl", grid_id: "files", width: 160}
     ],
 
 		rowClick: function(args) {},
@@ -189,10 +190,10 @@ $(function() {
 	});
 
 	$("form[name=newpaste] input[name=what]").click(function(ev) {
-		$("#editorbox").show();
+		$("#editorbox").css("visibility", "visible").show();
 		editor.focus();
 		$("form[name=newpaste] input[name=what]").hide();
-		return false;
+		ev.preventDefault();
 	});
 
 	/* new-dir stuff */

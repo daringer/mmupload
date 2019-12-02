@@ -8,13 +8,16 @@ body {
 
 input, input[type=submit], input[type=text], input[type=file],
 input[type=submit], input[type=number], input[type=button] {
-  font-size: 0.95em;
+  /*font-size: 0.975em;*/
+	font-size: 1em;
 	font-family: Monaco;
 	color: #454552;
 	/*border: 1px solid #7a7a7a;*/
 	border: 0;
   background-color: #c4c4c5;
 	box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);
+	/*padding-top: 0;
+	padding-bottom: 0;*/
 	/*padding: 3px;
 	margin-left: 0px;*/
 }
@@ -122,11 +125,13 @@ article {
 				display: table-cell;
 		    min-width: 250px;
 				border-right: 1.3px solid #7a7a7a;
+				height: 50vh !important;
     }
 		#files {
 				display: table-cell;
     		min-width: 250;
     		vertical-align: top;
+				height: 50vh !important;
 		}
 }
 
@@ -145,10 +150,10 @@ article {
 
 #editorbox {
 	background-color: #cccccc;
-	box-shadow:  1px 2px 2px rgba(0, 0, 0, .15);
+	box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);
   line-height: 2.4em;
   padding: 6px;
-  border: 1px solid #7a7a7a;
+  /*border: 1px solid #7a7a7a;*/
 }
 
 
@@ -170,10 +175,11 @@ article {
 	box-shadow:  1px 2px 2px rgba(0, 0, 0, .15);
   line-height: 2.4em;
   padding: 6px;
+  height: 2.4em;
   /*border: 1px solid #7a7a7a; */
 }
 
-#flash {
+/*#flash {
     position: fixed;
     left: 10px;
     bottom: 10px;
@@ -183,20 +189,24 @@ article {
 		width: 20%;
 		text-align: center;
 }
-
+*/
 #flash div {
    	font-weight: bold;
-    padding: 4px;
-    background-color: #ab6666;
-		opacity: 0.65;
-		margin-top: 4px;
+    background-color: #9a5f66;
+		display: inline-block;
+		padding-left: 8px;
+		padding-right: 10px;
+		color: #f8f8f8;
+		margin-right: 10px;
+		margin-bottom: 8px;
+		box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);
 }
 
 .jsgrid-edit-row input, .jsgrid-edit-row select, .jsgrid-edit-row textarea {
    padding: 0;
-	 padding-left: 5px;
+	 padding-left: 5px
 	 height: 2.0em;
-	 margin-left: -4px;
+	 margin-left: -5px;
 }
 
 .jsgrid-row, .jsgrid-alt-row, .jsgrid-header-row, .jsgrid-filter-row,
@@ -205,7 +215,7 @@ article {
 		background-color: unset;
 		overflow: unset;
 		border: 0;
-		line-height: 1.4em;
+		line-height: 1.6em;
 }
 
 .jsgrid-cell, .jsgrid-row>.jsgrid-cell, .jsgrid-alt-row>.jsgrid-cell, .jsgrid-edit-row,
