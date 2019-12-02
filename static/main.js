@@ -22,6 +22,9 @@ window.addEventListener("popstate", function(ev) {
 });
 
 function show_message(msg, error=false) {
+		if (msg == "None")
+			return;
+
 		var el = document.createElement("div");
 		$(el).text(msg).attr("class", (error) ? "err" : "info").hide();
 		$("#flash").append(el);
