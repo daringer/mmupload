@@ -109,6 +109,7 @@ def get_icon(icon):
 @app.route("/new/<path:dirname>", methods=["POST"])
 @requires_auth
 def create(dirname=""):
+    state = "ok"
     try:
         if request.form.get("what") == "create" and \
           len(request.form.get("new_dirname").strip()) > 0:
@@ -120,9 +121,10 @@ def create(dirname=""):
             app.config["UPLOADS_FILES_DEST"] = filedb.get_path(dirname)
             req_file = request.files.get("target")
             if not req_file:
-                msg = f"Something went wrong, no uploaded file found..."
+                msg = f"Error: no uploaded file found..."
+                state = "fail"
             else:
-                filename = filedb.create_file(dirname, request.files.get("target"))
+                filename = filedb.create_file(dirname, req_file)
                 msg = f"Saved to: {filename}"
 
         elif request.form.get("what") == "save":
@@ -133,9 +135,11 @@ def create(dirname=""):
 
         else:
             msg = "invalid request"
+            state = "fail"
     except FileDBError as e:
         msg = repr(e)
-    return jsonify({"dirname": dirname, "msgs": [msg]})
+        state = "fail"
+    return jsonify({"dirname": dirname, "msgs": [msg], "state": state})
 
 @app.route("/")
 @app.route("/dir/")

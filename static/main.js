@@ -38,7 +38,7 @@ function show_message(msg, error=false) {
 		});
 		$(el).text(msg).attr("class", (error) ? "err" : "info").hide();
 		$(el).prepend(ic);
-		$("#flash").append(el);
+		$("#flash").prepend(el);
 		$(el).fadeIn(1000, function() {
 			$(el).fadeOut(15000, function() {
 				$(el).remove();

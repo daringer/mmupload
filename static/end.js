@@ -223,9 +223,12 @@ $(function() {
 	/* upload stuff */
 
 	$("#upload").ajaxForm(function(ret) {
-  	show_message("file uploaded successfully");
-		update_grid("files", current_dir);
-
+		if (ret.state == "fail") {
+			ret.msgs.forEach((msg) => show_error(msg));
+		} else {
+  		show_message("file uploaded successfully");
+			update_grid("files", current_dir);
+		}
 		// clear upload file name field
 		$("form[name=upload] input[type=file]").val("");
   });
