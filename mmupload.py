@@ -80,14 +80,30 @@ requires_zone_auth = requires_auth
 ####
 
 @app.route("/local/<path:target>", methods=["GET"])
-@requires_auth
+#@requires_auth
 def get_static(target=""):
+    if ".." in target:
+        return;
+
     p = os.path.join("static", target)
     data = None
     with open(p, "r") as fd:
         data = fd.read()
     mime_info = mimetypes.guess_type(p)
     return Response(data, mimetype=mime_info[0])
+
+@app.route("/local/icon/<string:icon>", methods=["GET"])
+def get_icon(icon):
+    if ".." in icon:
+        return;
+
+    p = os.path.join("static", "icons", "svg", icon + ".svg")
+    data = None
+    with open(p, "r") as fd:
+        data = fd.read()
+    mime_info = mimetypes.guess_type(p)
+    return Response(data, mimetype=mime_info[0])
+
 
 @app.route("/new/", methods=["POST"])
 @app.route("/new/<path:dirname>", methods=["POST"])
@@ -151,7 +167,9 @@ def ls(what, dirname=""):
           "delete_url": url_for("delete", target=dct["path"]),
           "move_url": url_for("move", target=dct["path"]),
           "click_url": url_for("ls", what=what, dirname=dct["path"]) \
-            if what == "dirs" else url_for("get_file", target=dct["path"])
+            if what == "dirs" else url_for("get_file", target=dct["path"]),
+          "visit_url": url_for("show", dirname=dct["path"]) \
+            if what == "dirs" else url_for("get_file", target=dct["path"]),
         }, raw_list))
 
     data = {"data": data, "upload_url": url_for("create", dirname=dirname)}
@@ -174,15 +192,17 @@ def move(target):
     except OSError as e:
         return jsonify({"msg": repr(e), "state": "fail"})
 
+    shortinfo = ""
     new_short = request.form.get("new_short")
-    if filedb.get_meta_from_yaml(new_target).get("short", "") != new_short:
-        ret = filedb.update_meta_in_yaml(new_target, new_short)
-        shortinfo = f"new short: '{new_short}' already taken!" \
-                if not ret else \
-            (f"new short: '{new_short}'" if new_short != "" else \
-             "[REMOVED SHORT]")
+    if not (new_short is None or new_short == "None"):
+        if filedb.get_meta_from_yaml(new_target).get("short", "") != new_short:
+            ret = filedb.update_meta_in_yaml(new_target, new_short)
+            shortinfo = f"[new short: '{new_short}' already taken!]" \
+                    if not ret else \
+                (f"[new short: '{new_short}']" if new_short != "" else \
+                 "[REMOVED SHORT]")
 
-    return jsonify({"msg": f"'{target}' moved to '{new_target}'{shortinfo}",
+    return jsonify({"msg": f"'{target}' moved to '{new_target}' {shortinfo}",
                     "state": "ok"})
 
 @app.route("/del/<path:target>", methods=["POST"])

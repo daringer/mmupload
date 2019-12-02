@@ -8,21 +8,89 @@ body {
 
 input, input[type=submit], input[type=text], input[type=file],
 input[type=submit], input[type=number], input[type=button] {
-  font-size: 0.9em;
-	border: 1px solid #7a7a7a;
+  font-size: 0.95em;
+	font-family: Monaco;
+	color: #454552;
+	/*border: 1px solid #7a7a7a;*/
+	border: 0;
   background-color: #c4c4c5;
 	box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);
-	padding: 3px;
-	margin-left: 5px;
+	/*padding: 3px;
+	margin-left: 0px;*/
 }
 
-input[type=button] {
-	box-shadow: none;
+input[type=text] {
+	/*box-shadow: none;*/
+	height: 1.5em;
+}
+
+input[type=submit] {
+	/*box-shadow: none;*/
+	height: 1.55em;
+}
+
+form label {
+	margin-right: 10px;
+}
+
+#editorbox input[type=button], #editorbox input[type=submit] {
+	width: 33%;
+	padding: 4px;
+	margin: 0;
+	font-size: 1.1em;
+	font-weight: bold;
+	background-color: #141414;
+	color: #f8f8f8;
 }
 
 label {
 	font-weight: bold;
   text-align: left;
+}
+
+.iconbox {
+	display: inline-block;
+	padding: 0;
+	margin: 0;
+	vertical-alignment: middle;
+}
+
+.iconbox img { }
+
+.iconbox .tooltip {
+	visibility: hidden;
+  width: 10em;
+	border: 1px solid #7a7a7a;
+  background-color: #c4c4c5;
+  color: #000;
+  text-align: center;
+  border-radius: 3px;
+  position: absolute;
+	line-height: 1em;
+  font-size: 0.9em;
+	padding: 5px;
+	top: 10px;
+	right: 10px;
+	font-weight: bold;
+  z-index: 1;
+	opacity: 0.9;
+	box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);
+}
+
+.iconbox:hover .tooltip {
+	visibility: visible;
+}
+
+.icon {
+	height: 1.5em;
+	width: 1.5em;
+	margin-left: 1.0em;
+	opacity: 0.15;
+}
+
+.icon:hover {
+	background-color: #ababab;
+	opacity: 1.0;
 }
 
 a.uniquelink {
@@ -43,20 +111,21 @@ article {
 	margin-top: 8px;
 }
 
-@media only screen and (max-width: 799px) {
+@media only screen and (max-width: 999px) {
 #files, #dirs, #curpath, #tools, #editorbox {
-	width:100%;
+	width: 100%;
 }
 
 }
-@media only screen and (min-width: 800px) {
+@media only screen and (min-width: 1000px) {
     #dirs {
 				display: table-cell;
-		    min-width: 150px;
+		    min-width: 250px;
+				border-right: 1.3px solid #7a7a7a;
     }
 		#files {
 				display: table-cell;
-    		width: 50%;
+    		min-width: 250;
     		vertical-align: top;
 		}
 }
@@ -67,7 +136,7 @@ article {
 }
 
 #editor {
-	height: 500px;
+	height: 400px;
 }
 
 #pastebinlink {
@@ -82,18 +151,18 @@ article {
   border: 1px solid #7a7a7a;
 }
 
-#editorbox input[type=submit]{
-	width: 100%;
-	padding: 4px;
-	margin: 0;
-	font-size: 1.1em;
-	font-weight: bold;
-	background-color: #141414;
-	color: #f8f8f8;
-}
 
 .sublvlbox {
-	/*margin-right: auto;*/
+	padding-right: 20px;
+	margin-left: 20px;
+	border-right: 1px solid #7a7a7a;
+}
+
+.sublvlbox:first-child {
+	margin-left: 5px;
+}
+.sublvlbox:last-child {
+	border: 0;
 }
 
 .toplvlbox {
@@ -101,7 +170,7 @@ article {
 	box-shadow:  1px 2px 2px rgba(0, 0, 0, .15);
   line-height: 2.4em;
   padding: 6px;
-  border: 1px solid #7a7a7a;
+  /*border: 1px solid #7a7a7a; */
 }
 
 #flash {
@@ -123,6 +192,13 @@ article {
 		margin-top: 4px;
 }
 
+.jsgrid-edit-row input, .jsgrid-edit-row select, .jsgrid-edit-row textarea {
+   padding: 0;
+	 padding-left: 5px;
+	 height: 2.0em;
+	 margin-left: -4px;
+}
+
 .jsgrid-row, .jsgrid-alt-row, .jsgrid-header-row, .jsgrid-filter-row,
 .jsgrid-insert-row, .jsgrid-grid-body, .jsgrid-header-scrollbar,
 .jsgrid-nodata-row {
@@ -135,9 +211,9 @@ article {
 .jsgrid-cell, .jsgrid-row>.jsgrid-cell, .jsgrid-alt-row>.jsgrid-cell, .jsgrid-edit-row,
 .jsgrid-header-row>.jsgrid-header-cell, .jsgrid-nodata-row>.jsgrid-cell, .jsgrid-edit-row>.jsgrid-cell {
 		background-color: unset;
-		overflow: unset;
+		overflow: overlay; /* previously "unset" */
 		border: 0;
-		border-top: 1px solid #bebebe;
+		border-top: 1px dotted #bebebe;
 		margin: 2px;
 }
 

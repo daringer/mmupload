@@ -7,3 +7,6 @@
 [submodule "mmpy"]
 	path = mmpy
 	url = https://github.com/daringer/mmpy_snips.git
+[submodule "static/icons"]
+	path = static/icons
+	url = https://github.com/Templarian/MaterialDesign.git
