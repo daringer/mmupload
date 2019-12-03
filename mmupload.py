@@ -183,6 +183,8 @@ def ls(what, dirname=""):
     data = {"data": data, "upload_url": url_for("create", dirname=dirname)}
     return jsonify(data)
 
+
+### @TODO: RE-WORK !!!!
 @app.route("/edit/<path:target>", methods=["GET"])
 @requires_auth
 def edit(target):
@@ -260,6 +262,8 @@ def shorties(s_id):
         return jsonify({"msg": f"invalid request", "state": "fail"})
     return file_get_helper(rel_path)
 
+
+#### @TODO: same here -> rework!!!!
 #@app.route("/pastebin", methods=["GET", "POST"])
 @app.route("/pastebin", methods=["POST"])
 def pastebin():
@@ -298,7 +302,12 @@ def get_file(target):
 @app.route("/get/raw/<path:target>", methods=["GET"])
 @requires_auth
 def get_raw_file(target):
-    return jsonify(file_get_helper(target, raw=True))
+    try:
+        return jsonify(file_get_helper(target, raw=True))
+    except UnicodeDecodeError as e:
+        return jsonify({"state": "fail", "msgs":
+            ["Failed to load file as unicode...",
+             repr(e)[:50]] })
 
 @app.route("/get/<path:target>", methods=["GET"])
 def get_file_short(target):

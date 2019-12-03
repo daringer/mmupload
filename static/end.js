@@ -20,15 +20,19 @@ MyCtrlField.prototype = new jsGrid.Field({
 	render_contents: function(item) {
 		let base_url = "/local/icon/";
 		let suffix = ".svg";
-
 		let	ctrl_items = [
-				["edit",    "pencil"],
 				["rename",  "rename-box"],
 				["delete",  "delete"],
-				["preview", "magnify"],
 				["confirm", "check"],
 				["cancel",  "close"]
 			];
+		if (this.grid_id == "dirs")
+			//ctrl_items.push(...[[null, null], [null, null]]);
+		{}
+		else
+			ctrl_items.push(...[["edit", "pencil"],
+												  ["preview", "magnify"]]);
+
 		var htmls = ctrl_items.map((data, idx) =>
 				"<div class=iconbox id='iconbox_" + item.uid + "_" + data[0] +
 						"' onclick='ctrl_action(\"" + item.uid + "\", \"" + data[0] + "\");'" +
@@ -40,7 +44,6 @@ MyCtrlField.prototype = new jsGrid.Field({
 		);
 		return htmls.join("");
 	}
-
 });
 
 jsGrid.fields.myctrl = MyCtrlField;
@@ -50,7 +53,7 @@ var dir_grid = $("#dirs").jsGrid({
     width: "100%",
 
     editing: true,
-    sorting: true,
+    sorting: false,
 
 		confirmDeleting: false,
 
@@ -63,7 +66,8 @@ var dir_grid = $("#dirs").jsGrid({
       { name: "click_url", type: "text", visible: false},
 			{ name: "size", title: "Tree Size", type: "text", align: "left",
 				readOnly: true, editing: false, visible: false},
-  		{ name: "ctrl", title: "", type: "myctrl", grid_id: "dirs", width: 160}
+  		{ name: "ctrl", title: "", type: "myctrl", grid_id: "dirs", width: 80,
+				readOnly: true}
     ],
 
 		rowClick: function(args) {},
@@ -117,11 +121,11 @@ var file_grid = $("#files").jsGrid({
     width: "100%",
 
     editing: true,
-    sorting: true,
+    sorting: false,
 		confirmDeleting: false,
 
     fields: [
-      { name: "name", title: "Name", type: "text", width: 300 },
+      { name: "name", title: "Name", type: "text", width: 200 },
       { name: "path", type: "text", visible: false},
       { name: "short", title: "short-url", type: "text", width: 200},
       /* { name: "zones", type: "text", visible: false}, */
@@ -129,7 +133,7 @@ var file_grid = $("#files").jsGrid({
       { name: "move_url", type: "text", visible: false},
       { name: "delete_url", type: "text", visible: false},
       { name: "click_url", type: "text", visible: false},
-			{ name: "size", title: "Size", type: "text", align: "left", width: 250,
+			{ name: "size", title: "Size", type: "text", align: "left", width: 150,
 				readOnly: true, editing: false},
   		{ name: "ctrl", title: "", type: "myctrl", grid_id: "files", width: 160}
     ],
@@ -173,7 +177,7 @@ $(function() {
 
 	$("#editorbox").hide();
 
-	var editor = ace.edit("editor");
+	editor = ace.edit("editor");
   editor.setTheme("ace/theme/twilight");
   //editor.session.setMode("ace/mode/javascript");
 

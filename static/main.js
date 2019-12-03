@@ -23,7 +23,6 @@ window.addEventListener("popstate", function(ev) {
 });
 */
 
-
 function show_message(msg, error=false) {
 		if (msg == "None")
 			return;
@@ -50,7 +49,6 @@ function show_error(msg) {
 		show_message(msg, true);
 }
 
-
 function readable_size(size) {
 	var unit_idx = 0;
 	var units = {0: "B", 1: "KB", 2: "MB", 3: "GB"};
@@ -63,29 +61,57 @@ function readable_size(size) {
 }
 
 function show_preview(path) {
-
-
-}
-
-function show_editor(path) {
 	$.ajax({
 		type: "GET",
 		url: url_prefix + "/get/raw" + path,
-		error: function(ret) { show_error(ret.msg); },
+		error: function(ret) {
+			show_error(ret.msg);
+		},
 		success: function(ret) {
+			if (ret.state == "fail") {
+					ret.msgs.forEach(msg => show_error(msg));
+					return;
+			}
+		}
+	});
+}
+
+function show_editor(path, readonly=false) {
+	if (!path.indexOf("/") > -1)
+		path = "/" + path;
+
+	$("#" + "_editorbox").css({
+		visibility: "visible",
+		display: "block",
+		opacity: 0.0,
+	});
+	$("#" + "_editorbox").fadeIn(4000);
+
+	$.ajax({
+		type: "GET",
+		url: url_prefix + "/get/raw" + path,
+		error: function(ret) {
+			show_error(ret.msg);
+		},
+		success: function(ret) {
+			if (ret.state == "fail") {
+					ret.msgs.forEach(msg => show_error(msg));
+					return;
+			}
 			$("form[name=editor] input[name=contents]").val(ret);
+			$("#editorbox").css({display: "block", visibility: "visible"});
+			editor.$readOnly = readonly;
 			editor.setValue(ret);
 			editor.clearSelection();
-			$("form[name=editor] input[name=what]").click(function(ev) {
-				$("form[name=editor] input[name=contents]").val(editor.getValue());
+			editor.focus();
+			$("form[name=editor_ctrl] input[name=what]").click(function(ev) {
+				$("form[name=editor_ctrl] input[name=contents]").val(editor.getValue());
 				//ev.preventDefault();
 				//alert($("form[name=editor] input[name=contents]").val());
 			});
 		}
 	});
-
 }
-
 
 function update_active_directory(target) {
 	  $("#curpath").empty();
@@ -149,7 +175,6 @@ function show_ctrls(uid, show_ops, hide_ops) {
 		$("#iconbox_" + uid + "_" + my_mode).hide();
 }
 
-
 function ctrl_action(uid, op) {
 	let primary_modes = ["rename", "delete", "edit", "preview"];
 	let ask_modes = ["confirm", "cancel"];
@@ -166,10 +191,11 @@ function ctrl_action(uid, op) {
 		x.last_mode = x.active_mode;
 		x.active_mode = null;
 		show_ctrls(x.uid, primary_modes, ask_modes);
-	} else {
+	} else { //if (op == "delete" || op == "rename") {
 		x.last_mode = null;
 		x.active_mode = op;
-		show_ctrls(x.uid, ask_modes, primary_modes);
+		if (["delete", "rename", null].indexOf(op) > -1)
+			show_ctrls(x.uid, ask_modes, primary_modes);
 	}
 
 	if (x.active_mode == "rename") {
@@ -180,46 +206,57 @@ function ctrl_action(uid, op) {
 		show_ctrls(uid, ask_modes, primary_modes);
 		uid_editing = uid;
 
-		//$("#" + uid + "_name").closest("tr").attr("background-color", "red");
-		$("#iconbox_" + uid + "_confirm").parent().parent().css("background-color", "#bababc");
-
+		$("#iconbox_" + uid + "_confirm").parent().parent().
+			css("background-color", "#bababc");
 
 	} else if (x.active_mode == "delete") {
 		uid_editing = uid;
 
-	}
-
-	if (x.last_mode == "edit") {
-			alert("confirm edit");
+	/* load file into editor for ... I guess editing */
+  } else if (x.active_mode == "edit") {
+		show_editor(x.path);
+		show_ctrls(uid, primary_modes, ask_modes);
 	}
 
 	if (x.active_mode == "preview") {
-		alert("confirm preview");
+		if (x.mimetype === null) {
+			show_error("no mimetype, thus no preview!");
+			return;
+		}
+		let main_mime = x.mimetype.substr(0, 5);
+		if (["text/", "plain"].indexOf(main_mime) > -1) {
+				show_editor(x.path, true);
+				show_ctrls(uid, primary_modes, ask_modes);
+				//alert("confirm preview");
+		} else if (main_mime == "image") {
+				show_preview(x.path);
+				show_ctrls(uid, primary_modes, ask_modes);
+		}	else
+			show_error(`mimetype: ${x.mimetype} not yet preview-able...`);
 	}
 
 	if (x.active_mode == null) {
+
 		if (x.last_mode == "delete") {
 			if (op == "confirm") {
 				$("#" + uid2grid_id[uid]).jsGrid("deleteItem", x).done(function() {
 					update_grid(uid2grid_id[uid], current_dir);
 					show_ctrls(uid, primary_modes, ask_modes);
 				});
-			} else {
-				show_ctrls(uid, ask_modes, primary_modes);
-			}
-		}
+			} else
+				show_ctrls(uid, primary_modes, ask_modes);
 
-		else if (x.last_mode == "rename") {
+		}	else if (x.last_mode == "rename") {
 
 			if (op == "confirm")
 				$("#" + uid2grid_id[uid]).jsGrid("updateItem");
 			else {
 				$("#" + uid2grid_id[uid]).jsGrid("cancelEdit");
 				show_ctrls(uid, primary_modes, ask_modes);
-				$("#iconbox_" + uid + "_confirm").parent().parent().css("background-color", "unset");
+				$("#iconbox_" + uid + "_confirm").parent().parent().
+					css("background-color", "unset");
 			}
 			x.last_mode = null;
-
 		}
 	}
 
@@ -269,16 +306,13 @@ function update_grid(grid_id, target) {
 				ret.forEach(x => {
 					$("#" + grid_id).jsGrid("insertItem", x).then(function(e) {
 
-
 						$("#" + x.uid + "_name").closest("td").click(
 							{x: x, func: update_grid, grid_id: grid_id}, function(e) {
-								if (e.data.grid_id == "dirs") {
-									//e.data.func("dirs", e.data.x.path);
-									//e.data.func("files", e.data.x.path, true);
+								if (e.data.grid_id == "dirs")
 									window.location = $("#" + e.data.x.uid + "_name").attr("href");
-								} else {
+								else
 									window.location = e.data.x.click_url;
-								}
+
 						});
 
 						$("#" + x.uid + "_name").text($(x.name).text());
@@ -295,8 +329,6 @@ function update_grid(grid_id, target) {
 				if ($("#dirs table tbody tr:first td:first").text() == "..") {
 					$("#dirs table tbody tr:first td:last").text("");
 					$("#dirs table tbody tr:first td:first").click(function(e) {
-						/*update_grid("files", current_dir.split("/").slice(0, -1).join("/"));
-						update_grid("dirs", current_dir.split("/").slice(0, -1).join("/"));*/
 						window.location = "/dir/" + current_dir.split("/").slice(0, -1).join("/");
 					});
 

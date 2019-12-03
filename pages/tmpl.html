@@ -42,6 +42,8 @@
 	var uid2grid_id = new Object({});
 	var uid_editing = null;
 
+	var editor = null;
+
 </script>
 
 <body>
@@ -79,28 +81,33 @@
 			  </form>
 		  </div>
 
-			<div id=pastebinlink class=sublvlbox>
+			<!--div id=pastebinlink class=sublvlbox>
 				<form method=GET action="{{ url_for("pastebin") }}" name=newpaste>
 					<input type=submit value="new pastebin" name=what />
 				</form>
+			</div-->
+			<div id=editor_ctrl class=sublvlbox>
+				<form method=GET name=editor_ctrl action="{{ url_for("create", dirname=base_dir) }}">
+					<label>editor control:</label>
+					<input type=button name="new" value="new paste" />
+					<input type=button name="clear" value="clear & close" />
+					<input type=submit name="what" value="save data" />
+		  		<input type=hidden name=data />
+					<input type=hidden name=paste_from value=editor />
+				</form>
 			</div>
-
 		</div>
 	</article>
 
 	<article>
-		<div id=editorbox style="visibility: hidden;">
- 			  <form method=POST method="post" name=editor
-				  	  action="{{ url_for("pastebin") }}">
-	  			  <div id=editor></div>
-		  		  <input type=hidden name=data />
-						<input type=hidden name=paste_from value=editor />
-			    	<input type=submit value=update name=what />
-			    	<input type=button value=clear name=clear />
-			    	<input type=button value=hide name=hide />
-			  </form>
+		<div id=editorbox style="visibility: hidden; display: none;">
+	  	<div id=editor></div>
+		</div>
+		<div id=previewbox style="visibility: hidden; display: none;">
+			<img src="" />
 		</div>
 	</article>
+
 	<article>
 		<div id=flash class=toplvlbox></div>
 	</article>

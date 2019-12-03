@@ -7,7 +7,9 @@ body {
 }
 
 input, input[type=submit], input[type=text], input[type=file],
-input[type=submit], input[type=number], input[type=button] {
+input[type=submit], input[type=number], input[type=button],
+#editorbox input[type=button], #editorbox input[type=submit],
+#editor_ctrl input[type=button] {
   /*font-size: 0.975em;*/
 	font-size: 1em;
 	font-family: Monaco;
@@ -20,6 +22,10 @@ input[type=submit], input[type=number], input[type=button] {
 	padding-bottom: 0;*/
 	/*padding: 3px;
 	margin-left: 0px;*/
+}
+input[type=button] {
+	margin-right: 1em;
+	height: 1.55em;
 }
 
 input[type=text] {
@@ -34,16 +40,6 @@ input[type=submit] {
 
 form label {
 	margin-right: 10px;
-}
-
-#editorbox input[type=button], #editorbox input[type=submit] {
-	width: 33%;
-	padding: 4px;
-	margin: 0;
-	font-size: 1.1em;
-	font-weight: bold;
-	background-color: #141414;
-	color: #f8f8f8;
 }
 
 label {
@@ -83,44 +79,65 @@ label {
 .iconbox:hover .tooltip {
 	visibility: visible;
 }
-
 .icon {
 	height: 1.5em;
 	width: 1.5em;
 	margin-left: 1.0em;
-	opacity: 0.15;
+	opacity: 0.35;
 }
-
 .icon:hover {
 	background-color: #ababab;
 	opacity: 1.0;
 }
-
 a.uniquelink {
 	margin: 0;
 	padding: 0;
 	text-decoration: unset;
 }
 
-#files, #dirs, #curpath, #tools, #editorbox {
+#files, #dirs, #curpath, #tools, #editor_ctrl { }
+
+#editorbox {
+	background-color: #cccccc;
+  line-height: 2.4em;
+  padding: 6px;
+}
+
+.sublvlbox {
+	padding-right: 20px;
+	margin-left: 20px;
+	border-right: 1px solid #7a7a7a;
+}
+.sublvlbox:first-child {
+	margin-left: 5px;
+}
+.sublvlbox:last-child {
+	border: 0;
+}
+.toplvlbox {
+  background-color: #cccccc;
+	box-shadow:  1px 2px 2px rgba(0, 0, 0, .15);
+  line-height: 2.4em;
+  padding: 6px;
+  height: 2.4em;
 }
 
 article {
 	margin: 0;
 	padding: 0;
-	width: 90%;
-  margin-left: auto ;
-  margin-right: auto ;
+	width: 95%;
+  margin-left: auto;
+  margin-right: auto;
 	margin-top: 8px;
 }
 
-@media only screen and (max-width: 999px) {
-#files, #dirs, #curpath, #tools, #editorbox {
-	width: 100%;
+@media only screen and (max-width: 1279px) {
+	#files, #dirs, #curpath, #tools, #editorbox {
+		width: 100%;
+	}
 }
-
-}
-@media only screen and (min-width: 1000px) {
+/*** screens < 1280px (smartphones) */
+@media only screen and (min-width: 1280px) {
     #dirs {
 				display: table-cell;
 		    min-width: 250px;
@@ -144,52 +161,17 @@ article {
 	height: 400px;
 }
 
-#pastebinlink {
 
+
+#flash div .err {
+		background-color: #db02b5bb;
 }
-
-#editorbox {
+#flash {
 	background-color: #cccccc;
-	box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);
   line-height: 2.4em;
   padding: 6px;
-  /*border: 1px solid #7a7a7a;*/
+	width: 100%;
 }
-
-
-.sublvlbox {
-	padding-right: 20px;
-	margin-left: 20px;
-	border-right: 1px solid #7a7a7a;
-}
-
-.sublvlbox:first-child {
-	margin-left: 5px;
-}
-.sublvlbox:last-child {
-	border: 0;
-}
-
-.toplvlbox {
-  background-color: #cccccc;
-	box-shadow:  1px 2px 2px rgba(0, 0, 0, .15);
-  line-height: 2.4em;
-  padding: 6px;
-  height: 2.4em;
-  /*border: 1px solid #7a7a7a; */
-}
-
-/*#flash {
-    position: fixed;
-    left: 10px;
-    bottom: 10px;
-		padding: 0;
-		border: 0;
-		background-color: unset;
-		width: 20%;
-		text-align: center;
-}
-*/
 #flash div {
    	font-weight: bold;
     background-color: #9a5f66;
@@ -199,14 +181,14 @@ article {
 		color: #f8f8f8;
 		margin-right: 10px;
 		margin-bottom: 8px;
-		box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);
+		/*box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);*/
 }
 
 .jsgrid-edit-row input, .jsgrid-edit-row select, .jsgrid-edit-row textarea {
    padding: 0;
 	 padding-left: 5px
 	 height: 2.0em;
-	 margin-left: -5px;
+	 margin-left: 0px;
 }
 
 .jsgrid-row, .jsgrid-alt-row, .jsgrid-header-row, .jsgrid-filter-row,
@@ -236,10 +218,6 @@ article {
 		border-bottom: 2px solid #7a7a7a;
 		text-align: left;
 		background-color: unset;
-}
-
-#flash div .err {
-		background-color: #db02b5bb;
 }
 
 #files a.name, #dirs a.name {
@@ -281,4 +259,22 @@ a:hover {
 br {
 	clear: both;
 }
+
+
+
+/* PLAYGROUND */
+
+
+.topink {
+  filter: brightness(0.5) sepia(1) hue-rotate(-70deg) saturate(5);
+}
+.tonavy {
+  filter: brightness(0.2) sepia(1) hue-rotate(180deg) saturate(5);
+}
+.toblue {
+  filter: brightness(0.5) sepia(1) hue-rotate(140deg) saturate(6);
+}
+
+
+
 
