@@ -14,33 +14,33 @@ MyCtrlField.prototype = new jsGrid.Field({
 	filtering: false,
 
 	itemTemplate: function(value, item) {
-			return this.render_contents(item);
+		return this.render_contents(item);
 	},
 
 	render_contents: function(item) {
 		let base_url = "/local/icon/";
 		let suffix = ".svg";
 		let	ctrl_items = [
-				["rename",  "rename-box"],
-				["delete",  "delete"],
-				["confirm", "check"],
-				["cancel",  "close"]
-			];
+			["rename",  "rename-box"],
+			["delete",  "delete"],
+			["confirm", "check"],
+			["cancel",  "close"]
+		];
 		if (this.grid_id == "dirs")
 			//ctrl_items.push(...[[null, null], [null, null]]);
 		{}
 		else
 			ctrl_items.push(...[["edit", "pencil"],
-												  ["preview", "magnify"]]);
+				["preview", "magnify"]]);
 
 		var htmls = ctrl_items.map((data, idx) =>
-				"<div class=iconbox id='iconbox_" + item.uid + "_" + data[0] +
-						"' onclick='ctrl_action(\"" + item.uid + "\", \"" + data[0] + "\");'" +
-					  "  onload='show_mode(\"" + item.active_mode + "\");' >" +
-				"<img src='" + base_url + data[1] + "' class='icon' alt='" +
-									data[0] + "' />" +
-			  "<span class=tooltip>" + data[0] + "</span>" +
-			  "</div>"
+			"<div class=iconbox id='iconbox_" + item.uid + "_" + data[0] +
+			"' onclick='ctrl_action(\"" + item.uid + "\", \"" + data[0] + "\");'" +
+			"  onload='show_mode(\"" + item.active_mode + "\");' >" +
+			"<img src='" + base_url + data[1] + "' class='icon' alt='" +
+			data[0] + "' />" +
+			"<span class=tooltip>" + data[0] + "</span>" +
+			"</div>"
 		);
 		return htmls.join("");
 	}
@@ -50,123 +50,123 @@ jsGrid.fields.myctrl = MyCtrlField;
 
 var dir_grid = $("#dirs").jsGrid({
 
-    width: "100%",
+	width: "100%",
 
-    editing: true,
-    sorting: false,
+	editing: true,
+	sorting: false,
 
-		confirmDeleting: false,
+	confirmDeleting: false,
 
-    fields: [
-      { name: "name", title: "Directory Name", type: "text", width: 300 },
-   		{ name: "path", type: "text", visible: false},
-	  	{ name: "mimetype", type: "text", visible: false},
-      { name: "move_url", type: "text", visible: false},
-      { name: "delete_url", type: "text", visible: false},
-      { name: "click_url", type: "text", visible: false},
-			{ name: "size", title: "Tree Size", type: "text", align: "left",
-				readOnly: true, editing: false, visible: false},
-  		{ name: "ctrl", title: "", type: "myctrl", grid_id: "dirs", width: 80,
-				readOnly: true}
-    ],
+	fields: [
+		{ name: "name", title: "Directory Name", type: "text", width: 300 },
+		{ name: "path", type: "text", visible: false},
+		{ name: "mimetype", type: "text", visible: false},
+		{ name: "move_url", type: "text", visible: false},
+		{ name: "delete_url", type: "text", visible: false},
+		{ name: "click_url", type: "text", visible: false},
+		{ name: "size", title: "Tree Size", type: "text", align: "left",
+			readOnly: true, editing: false, visible: false},
+		{ name: "ctrl", title: "", type: "myctrl", grid_id: "dirs", width: 80,
+			readOnly: true}
+	],
 
-		rowClick: function(args) {},
+	rowClick: function(args) {},
 
-		onItemEditing: function(args) {
-				//focus_cell.closest("input").focus();
-			  // @TODO: focus name cell HERE!!!
-		},
+	onItemEditing: function(args) {
+		//focus_cell.closest("input").focus();
+		// @TODO: focus name cell HERE!!!
+	},
 
-		// before updating is done in grid
-		onItemUpdating: function(args) {
-				if (args.item.name != "")
-						$.ajax({
-							type: "POST",
-							data: {new_target: args.item.name},
-							url: args.item.move_url,
-							error: function() {
-								show_message("error moving", true);
-							},
-							success: function(ret) {
-								show_message(ret["msg"]);
-								update_grid("dirs", current_dir, true);
-							}
-				})
-		},
-
-		// before deletion is done in grid
-    onItemDeleting: function(args) {
+	// before updating is done in grid
+	onItemUpdating: function(args) {
+		if (args.item.name != "")
 			$.ajax({
 				type: "POST",
-				url: args.item.delete_url,
+				data: {new_target: args.item.name},
+				url: args.item.move_url,
 				error: function() {
-					show_message("error deleting path", true);
+					show_message("error moving", true);
 				},
 				success: function(ret) {
 					show_message(ret["msg"]);
+					update_grid("dirs", current_dir, true);
 				}
-			});
-		},
+			})
+	},
 
-		onItemDeleted: function(args) {
-			/*args.grid.render().then(function() {
+	// before deletion is done in grid
+	onItemDeleting: function(args) {
+		$.ajax({
+			type: "POST",
+			url: args.item.delete_url,
+			error: function() {
+				show_message("error deleting path", true);
+			},
+			success: function(ret) {
+				show_message(ret["msg"]);
+			}
+		});
+	},
+
+	onItemDeleted: function(args) {
+		/*args.grid.render().then(function() {
 				show_mode(args.item.active_mode);
 			});*/
-		}
+	}
 
 });
 
 var file_grid = $("#files").jsGrid({
 
-    width: "100%",
+	width: "100%",
 
-    editing: true,
-    sorting: false,
-		confirmDeleting: false,
+	editing: true,
+	sorting: false,
+	confirmDeleting: false,
 
-    fields: [
-      { name: "name", title: "Name", type: "text", width: 200 },
-      { name: "path", type: "text", visible: false},
-      { name: "short", title: "short-url", type: "text", width: 200},
-      /* { name: "zones", type: "text", visible: false}, */
-			{ name: "mimetype", type: "text", visible: false},
-      { name: "move_url", type: "text", visible: false},
-      { name: "delete_url", type: "text", visible: false},
-      { name: "click_url", type: "text", visible: false},
-			{ name: "size", title: "Size", type: "text", align: "left", width: 150,
-				readOnly: true, editing: false},
-  		{ name: "ctrl", title: "", type: "myctrl", grid_id: "files", width: 160}
-    ],
+	fields: [
+		{ name: "name", title: "Name", type: "text", width: 200 },
+		{ name: "path", type: "text", visible: false},
+		{ name: "short", title: "short-url", type: "text", width: 200},
+		/* { name: "zones", type: "text", visible: false}, */
+		{ name: "mimetype", type: "text", visible: false},
+		{ name: "move_url", type: "text", visible: false},
+		{ name: "delete_url", type: "text", visible: false},
+		{ name: "click_url", type: "text", visible: false},
+		{ name: "size", title: "Size", type: "text", align: "left", width: 150,
+			readOnly: true, editing: false},
+		{ name: "ctrl", title: "", type: "myctrl", grid_id: "files", width: 160}
+	],
 
-		rowClick: function(args) {},
+	rowClick: function(args) {},
 
-		// before updating is done in grid
-		onItemUpdating: function(args) {
-				if (args.item.name != "")
-						$.ajax({
-							type: "POST",
-							data: { new_target: args.item.name, new_short: args.item.short },
-							url: args.item.move_url,
-							error: function() { show_error("error moving"); },
-							success: function(ret) {
-								show_message(ret["msg"]);
-								update_grid("files", current_dir, true);
-							}
-						});
-		},
-		// before deletion is done in grid
-    onItemDeleting: function(args) {
+	// before updating is done in grid
+	onItemUpdating: function(args) {
+		if (args.item.name != "")
 			$.ajax({
 				type: "POST",
-				url: args.item.delete_url,
-				error: function() {
-					show_error("error deleting path");
-				},
+				data: { new_target: args.item.name, new_short: args.item.short },
+				url: args.item.move_url,
+				error: function() { show_error("error moving"); },
 				success: function(ret) {
 					show_message(ret["msg"]);
+					update_grid("files", current_dir, true);
 				}
 			});
-		}
+	},
+	// before deletion is done in grid
+	onItemDeleting: function(args) {
+		$.ajax({
+			type: "POST",
+			url: args.item.delete_url,
+			error: function() {
+				show_error("error deleting path");
+			},
+			success: function(ret) {
+				show_message(ret["msg"]);
+			}
+		});
+	}
 });
 
 $(function() {
@@ -178,19 +178,19 @@ $(function() {
 	$("#editorbox").hide();
 
 	editor = ace.edit("editor");
-  editor.setTheme("ace/theme/twilight");
-  //editor.session.setMode("ace/mode/javascript");
+	editor.setTheme("ace/theme/twilight");
+	//editor.session.setMode("ace/mode/javascript");
 
 	$("form[name=editor] input[name=what]").click(function(ev) {
-			$("form[name=editor] input[name=data]").val(editor.getValue());
+		$("form[name=editor] input[name=data]").val(editor.getValue());
 	});
 	$("form[name=editor] input[name=clear]").click(function(ev) {
-			editor.setValue("");
+		editor.setValue("");
 	});
 	$("form[name=editor] input[name=hide]").click(function(ev) {
-			editor.setValue("");
-			$("#editorbox").hide();
-			$("form[name=newpaste] input[name=what]").show();
+		editor.setValue("");
+		$("#editorbox").hide();
+		$("form[name=newpaste] input[name=what]").show();
 	});
 
 	$("form[name=newpaste] input[name=what]").click(function(ev) {
@@ -230,12 +230,12 @@ $(function() {
 		if (ret.state == "fail") {
 			ret.msgs.forEach((msg) => show_error(msg));
 		} else {
-  		show_message("file uploaded successfully");
+			show_message("file uploaded successfully");
 			update_grid("files", current_dir);
 		}
 		// clear upload file name field
 		$("form[name=upload] input[type=file]").val("");
-  });
+	});
 
 });
 

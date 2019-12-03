@@ -24,29 +24,29 @@ window.addEventListener("popstate", function(ev) {
 */
 
 function show_message(msg, error=false) {
-		if (msg == "None")
-			return;
+	if (msg == "None")
+		return;
 
-		var el = document.createElement("div");
-	  var ic = document.createElement("img");
-	  $(ic).attr("src", "/local/icons/svg/exclamation.svg");
-	  $(ic).css({
-				position: "relative",
-			  left: "-2px",
-				top: "7px"
+	var el = document.createElement("div");
+	var ic = document.createElement("img");
+	$(ic).attr("src", "/local/icons/svg/exclamation.svg");
+	$(ic).css({
+		position: "relative",
+		left: "-2px",
+		top: "7px"
+	});
+	$(el).text(msg).attr("class", (error) ? "err" : "info").hide();
+	$(el).prepend(ic);
+	$("#flash").prepend(el);
+	$(el).fadeIn(1000, function() {
+		$(el).fadeOut(15000, function() {
+			$(el).remove();
 		});
-		$(el).text(msg).attr("class", (error) ? "err" : "info").hide();
-		$(el).prepend(ic);
-		$("#flash").prepend(el);
-		$(el).fadeIn(1000, function() {
-			$(el).fadeOut(15000, function() {
-				$(el).remove();
-			});
-		});
+	});
 }
 
 function show_error(msg) {
-		show_message(msg, true);
+	show_message(msg, true);
 }
 
 function readable_size(size) {
@@ -55,7 +55,7 @@ function readable_size(size) {
 	var out_size = size;
 	while (out_size > 1024 || unit_idx == 0) {
 		out_size = out_size / 1024.;
-	  unit_idx++;
+		unit_idx++;
 	}
 	return out_size.toFixed(3) + " " + units[unit_idx];
 }
@@ -69,8 +69,8 @@ function show_preview(path) {
 		},
 		success: function(ret) {
 			if (ret.state == "fail") {
-					ret.msgs.forEach(msg => show_error(msg));
-					return;
+				ret.msgs.forEach(msg => show_error(msg));
+				return;
 			}
 		}
 	});
@@ -95,8 +95,8 @@ function show_editor(path, readonly=false) {
 		},
 		success: function(ret) {
 			if (ret.state == "fail") {
-					ret.msgs.forEach(msg => show_error(msg));
-					return;
+				ret.msgs.forEach(msg => show_error(msg));
+				return;
 			}
 			$("form[name=editor] input[name=contents]").val(ret);
 			$("#editorbox").css({display: "block", visibility: "visible"});
@@ -114,47 +114,47 @@ function show_editor(path, readonly=false) {
 }
 
 function update_active_directory(target) {
-	  $("#curpath").empty();
+	$("#curpath").empty();
 
-		var l = document.createElement("label");
-		$(l).text("current path: ");
-		$("#curpath").append(l);
+	var l = document.createElement("label");
+	$(l).text("current path: ");
+	$("#curpath").append(l);
 
-		var prepath = url_prefix + "/dir";
+	var prepath = url_prefix + "/dir";
 
-		if (target != ".")
-			var toks = target.split("/");
+	if (target != ".")
+		var toks = target.split("/");
+	else
+		var toks = [""];
+
+	if (toks.length > 0 && toks[0] != "")
+		toks = [""].concat(toks);
+
+	for(var tok of toks) {
+		var el = document.createElement("a");
+		$(el).attr("href", prepath + tok);
+		if (tok == "")
+			$(el).text("[root]");
 		else
-			var toks = [""];
+			$(el).text(tok);
 
-		if (toks.length > 0 && toks[0] != "")
-			toks = [""].concat(toks);
+		$("#curpath").append(el);
+		$("#curpath").append(" / ");
+		prepath = prepath + tok + "/";
+	}
+	current_dir = target;
 
-		for(var tok of toks) {
-			var el = document.createElement("a");
-			$(el).attr("href", prepath + tok);
-			if (tok == "")
-				$(el).text("[root]");
-			else
-				$(el).text(tok);
+	if (current_dir != "") {
+		$("#upload").show();
+		$("#files").show();
+	} else {
+		$("#upload").hide();
+		//$("#files").hide();
+		/*$("#files").attr("width", "10%");*/
+		//$("#files").text("");
 
-			$("#curpath").append(el);
-			$("#curpath").append(" / ");
-			prepath = prepath + tok + "/";
-		}
-	  current_dir = target;
-
-		if (current_dir != "") {
-			$("#upload").show();
-			$("#files").show();
-		} else {
-			$("#upload").hide();
-			//$("#files").hide();
-			/*$("#files").attr("width", "10%");*/
-			//$("#files").text("");
-
-			//$("#dirs").attr("display", "block");
-		}
+		//$("#dirs").attr("display", "block");
+	}
 }
 
 function show_mode(mymode) {
@@ -212,8 +212,8 @@ function ctrl_action(uid, op) {
 	} else if (x.active_mode == "delete") {
 		uid_editing = uid;
 
-	/* load file into editor for ... I guess editing */
-  } else if (x.active_mode == "edit") {
+		/* load file into editor for ... I guess editing */
+	} else if (x.active_mode == "edit") {
 		show_editor(x.path);
 		show_ctrls(uid, primary_modes, ask_modes);
 	}
@@ -225,12 +225,12 @@ function ctrl_action(uid, op) {
 		}
 		let main_mime = x.mimetype.substr(0, 5);
 		if (["text/", "plain"].indexOf(main_mime) > -1) {
-				show_editor(x.path, true);
-				show_ctrls(uid, primary_modes, ask_modes);
-				//alert("confirm preview");
+			show_editor(x.path, true);
+			show_ctrls(uid, primary_modes, ask_modes);
+			//alert("confirm preview");
 		} else if (main_mime == "image") {
-				show_preview(x.path);
-				show_ctrls(uid, primary_modes, ask_modes);
+			show_preview(x.path);
+			show_ctrls(uid, primary_modes, ask_modes);
 		}	else
 			show_error(`mimetype: ${x.mimetype} not yet preview-able...`);
 	}
@@ -266,7 +266,7 @@ function update_grid(grid_id, target) {
 	//$("#" + grid_id).jsGrid("option", "data", []);
 
 	if (grid_id == "dirs")
-			update_active_directory(target);
+		update_active_directory(target);
 
 	var myurl = url_prefix + "/list/" + grid_id + "/" + target;
 
@@ -277,65 +277,64 @@ function update_grid(grid_id, target) {
 			show_message("error getting files within 'get_dir()'", true);
 		},
 		success: function(ret) {
-				$("#" + grid_id).jsGrid("option", "data", []);
-			  $("#upload form").attr("action", ret.upload_url);
-			  $("#newdir form").attr("action", ret.upload_url);
+			$("#" + grid_id).jsGrid("option", "data", []);
+			$("#upload form").attr("action", ret.upload_url);
+			$("#newdir form").attr("action", ret.upload_url);
 
-				ret = ret.data;
+			ret = ret.data;
 
-				if (grid_id == "dirs" && (target != "" && target != ".")) {
-					var parent_url = target.split("/").slice(0, -1).join("/");
-					$("#" + grid_id).jsGrid("insertItem",
-									{"name": "..", "path": parent_url});
-				}
+			if (grid_id == "dirs" && (target != "" && target != ".")) {
+				var parent_url = target.split("/").slice(0, -1).join("/");
+				$("#" + grid_id).jsGrid("insertItem",
+					{"name": "..", "path": parent_url});
+			}
 
-				// update size
-			  ret = ret.map(x => {
-					// human-readable
-					x.size = readable_size(x.size);
-					// set once to be able to identify <td> containing name
-					x.name = `<a href="${x.visit_url}" id="${x.uid}_name" class=uniquelink>${x.name}</a>`;
-					// active_mode != null, if some intermediate state is active
-					// -> confirm: edit, rename, delete + preview
-					x.active_mode = null;
-					x.last_mode = null;
-					x.ctrl = null;
-					return x;
-				});
+			// update size
+			ret = ret.map(x => {
+				// human-readable
+				x.size = readable_size(x.size);
+				// set once to be able to identify <td> containing name
+				x.name = `<a href="${x.visit_url}" id="${x.uid}_name" class=uniquelink>${x.name}</a>`;
+				// active_mode != null, if some intermediate state is active
+				// -> confirm: edit, rename, delete + preview
+				x.active_mode = null;
+				x.last_mode = null;
+				x.ctrl = null;
+				return x;
+			});
 
-				ret.forEach(x => {
-					$("#" + grid_id).jsGrid("insertItem", x).then(function(e) {
+			ret.forEach(x => {
+				$("#" + grid_id).jsGrid("insertItem", x).then(function(e) {
 
-						$("#" + x.uid + "_name").closest("td").click(
-							{x: x, func: update_grid, grid_id: grid_id}, function(e) {
-								if (e.data.grid_id == "dirs")
-									window.location = $("#" + e.data.x.uid + "_name").attr("href");
-								else
-									window.location = e.data.x.click_url;
-
+					$("#" + x.uid + "_name").closest("td").click(
+						{x: x, func: update_grid, grid_id: grid_id}, function(e) {
+							if (e.data.grid_id == "dirs")
+								window.location = $("#" + e.data.x.uid + "_name").attr("href");
+							else
+								window.location = e.data.x.click_url;
 						});
 
-						$("#" + x.uid + "_name").text($(x.name).text());
-						x.name = $(x.name).text();
+					$("#" + x.uid + "_name").text($(x.name).text());
+					x.name = $(x.name).text();
 
-						uid2item[x.uid] = x;
-						uid2grid_id[x.uid] = grid_id;
+					uid2item[x.uid] = x;
+					uid2grid_id[x.uid] = grid_id;
 
-						show_ctrls(x.uid, [], ["confirm", "cancel"]);
+					show_ctrls(x.uid, [], ["confirm", "cancel"]);
 
-						});
 				});
+			});
 
-				if ($("#dirs table tbody tr:first td:first").text() == "..") {
-					$("#dirs table tbody tr:first td:last").text("");
-					$("#dirs table tbody tr:first td:first").click(function(e) {
-						window.location = "/dir/" + current_dir.split("/").slice(0, -1).join("/");
-					});
-
-				}
-
+			if ($("#dirs table tbody tr:first td:first").text() == "..") {
+				$("#dirs table tbody tr:first td:last").text("");
+				$("#dirs table tbody tr:first td:first").click(function(e) {
+					window.location = "/dir/" + current_dir.split("/").slice(0, -1).join("/");
+				});
 
 			}
+
+
+		}
 	});
 }
 

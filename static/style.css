@@ -2,7 +2,7 @@
 body {
 	background-color: #bababc;
 	font-family: Monaco;
-  font-size: 0.9em;
+	font-size: 0.9em;
 	overflow: hidden;
 }
 
@@ -10,18 +10,18 @@ input, input[type=submit], input[type=text], input[type=file],
 input[type=submit], input[type=number], input[type=button],
 #editorbox input[type=button], #editorbox input[type=submit],
 #editor_ctrl input[type=button] {
-  /*font-size: 0.975em;*/
+	/*font-size: 0.975em;*/
 	font-size: 1em;
 	font-family: Monaco;
 	color: #454552;
 	/*border: 1px solid #7a7a7a;*/
 	border: 0;
-  background-color: #c4c4c5;
+	background-color: #c4c4c5;
 	box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);
 	/*padding-top: 0;
 	padding-bottom: 0;*/
-	/*padding: 3px;
-	margin-left: 0px;*/
+/*padding: 3px;
+margin-left: 0px;*/
 }
 input[type=button] {
 	margin-right: 1em;
@@ -44,7 +44,7 @@ form label {
 
 label {
 	font-weight: bold;
-  text-align: left;
+	text-align: left;
 }
 
 .iconbox {
@@ -58,20 +58,20 @@ label {
 
 .iconbox .tooltip {
 	visibility: hidden;
-  width: 10em;
+	width: 10em;
 	border: 1px solid #7a7a7a;
-  background-color: #c4c4c5;
-  color: #000;
-  text-align: center;
-  border-radius: 3px;
-  position: absolute;
+	background-color: #c4c4c5;
+	color: #000;
+	text-align: center;
+	border-radius: 3px;
+	position: absolute;
 	line-height: 1em;
-  font-size: 0.9em;
+	font-size: 0.9em;
 	padding: 5px;
 	top: 10px;
 	right: 10px;
 	font-weight: bold;
-  z-index: 1;
+	z-index: 1;
 	opacity: 0.9;
 	box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);
 }
@@ -99,8 +99,8 @@ a.uniquelink {
 
 #editorbox {
 	background-color: #cccccc;
-  line-height: 2.4em;
-  padding: 6px;
+	line-height: 2.4em;
+	padding: 6px;
 }
 
 .sublvlbox {
@@ -115,19 +115,19 @@ a.uniquelink {
 	border: 0;
 }
 .toplvlbox {
-  background-color: #cccccc;
+	background-color: #cccccc;
 	box-shadow:  1px 2px 2px rgba(0, 0, 0, .15);
-  line-height: 2.4em;
-  padding: 6px;
-  height: 2.4em;
+	line-height: 2.4em;
+	padding: 6px;
+	height: 2.4em;
 }
 
 article {
 	margin: 0;
 	padding: 0;
 	width: 95%;
-  margin-left: auto;
-  margin-right: auto;
+	margin-left: auto;
+	margin-right: auto;
 	margin-top: 8px;
 }
 
@@ -138,18 +138,18 @@ article {
 }
 /*** screens < 1280px (smartphones) */
 @media only screen and (min-width: 1280px) {
-    #dirs {
-				display: table-cell;
-		    min-width: 250px;
-				border-right: 1.3px solid #7a7a7a;
-				height: 50vh !important;
-    }
-		#files {
-				display: table-cell;
-    		min-width: 250;
-    		vertical-align: top;
-				height: 50vh !important;
-		}
+	#dirs {
+		display: table-cell;
+		min-width: 250px;
+		border-right: 1.3px solid #7a7a7a;
+		height: 50vh !important;
+	}
+	#files {
+		display: table-cell;
+		min-width: 250;
+		vertical-align: top;
+		height: 50vh !important;
+	}
 }
 
 #tools {
@@ -164,60 +164,60 @@ article {
 
 
 #flash div .err {
-		background-color: #db02b5bb;
+	background-color: #db02b5bb;
 }
 #flash {
 	background-color: #cccccc;
-  line-height: 2.4em;
-  padding: 6px;
+	line-height: 2.4em;
+	padding: 6px;
 	width: 100%;
 }
 #flash div {
-   	font-weight: bold;
-    background-color: #9a5f66;
-		display: inline-block;
-		padding-left: 8px;
-		padding-right: 10px;
-		color: #f8f8f8;
-		margin-right: 10px;
-		margin-bottom: 8px;
-		/*box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);*/
+	font-weight: bold;
+	background-color: #9a5f66;
+	display: inline-block;
+	padding-left: 8px;
+	padding-right: 10px;
+	color: #f8f8f8;
+	margin-right: 10px;
+	margin-bottom: 8px;
+	/*box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);*/
 }
 
 .jsgrid-edit-row input, .jsgrid-edit-row select, .jsgrid-edit-row textarea {
-   padding: 0;
-	 padding-left: 5px
-	 height: 2.0em;
-	 margin-left: 0px;
+	padding: 0;
+	padding-left: 5px
+	height: 2.0em;
+	margin-left: 0px;
 }
 
 .jsgrid-row, .jsgrid-alt-row, .jsgrid-header-row, .jsgrid-filter-row,
 .jsgrid-insert-row, .jsgrid-grid-body, .jsgrid-header-scrollbar,
 .jsgrid-nodata-row {
-		background-color: unset;
-		overflow: unset;
-		border: 0;
-		line-height: 1.6em;
+	background-color: unset;
+	overflow: unset;
+	border: 0;
+	line-height: 1.6em;
 }
 
 .jsgrid-cell, .jsgrid-row>.jsgrid-cell, .jsgrid-alt-row>.jsgrid-cell, .jsgrid-edit-row,
 .jsgrid-header-row>.jsgrid-header-cell, .jsgrid-nodata-row>.jsgrid-cell, .jsgrid-edit-row>.jsgrid-cell {
-		background-color: unset;
-		overflow: overlay; /* previously "unset" */
-		border: 0;
-		border-top: 1px dotted #bebebe;
-		margin: 2px;
+	background-color: unset;
+	overflow: overlay; /* previously "unset" */
+	border: 0;
+	border-top: 1px dotted #bebebe;
+	margin: 2px;
 }
 
- .jsgrid-row:hover, .jsgrid-alt-row:hover {
-		background-color: #bfbfbf;
+.jsgrid-row:hover, .jsgrid-alt-row:hover {
+	background-color: #bfbfbf;
 }
 
 .jsgrid-header-row>.jsgrid-header-cell {
-		border: 0;
-		border-bottom: 2px solid #7a7a7a;
-		text-align: left;
-		background-color: unset;
+	border: 0;
+	border-bottom: 2px solid #7a7a7a;
+	text-align: left;
+	background-color: unset;
 }
 
 #files a.name, #dirs a.name {
@@ -266,13 +266,13 @@ br {
 
 
 .topink {
-  filter: brightness(0.5) sepia(1) hue-rotate(-70deg) saturate(5);
+	filter: brightness(0.5) sepia(1) hue-rotate(-70deg) saturate(5);
 }
 .tonavy {
-  filter: brightness(0.2) sepia(1) hue-rotate(180deg) saturate(5);
+	filter: brightness(0.2) sepia(1) hue-rotate(180deg) saturate(5);
 }
 .toblue {
-  filter: brightness(0.5) sepia(1) hue-rotate(140deg) saturate(6);
+	filter: brightness(0.5) sepia(1) hue-rotate(140deg) saturate(6);
 }
 
 
