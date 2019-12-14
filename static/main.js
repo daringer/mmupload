@@ -245,7 +245,6 @@ function ctrl_action(uid, op) {
 		if (["text/", "plain"].indexOf(main_mime) > -1) {
 			show_editor(x.path, true);
 			show_ctrls(uid, primary_modes, ask_modes);
-			//alert("confirm preview");
 		} else if (main_mime == "image") {
 			show_preview(x.path);
 			show_ctrls(uid, primary_modes, ask_modes);
