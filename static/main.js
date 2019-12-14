@@ -261,7 +261,8 @@ function ctrl_action(uid, op) {
 		if (x.last_mode == "delete") {
 			if (op == "confirm") {
 				$("#" + uid2grid_id[uid]).jsGrid("deleteItem", x).done(function() {
-					update_grid(uid2grid_id[uid], current_dir);
+					//if (uid2grid_id[uid] != "dirs") @FIXME: do not update full tbl here!
+						update_grid(uid2grid_id[uid], current_dir);
 					show_ctrls(uid, primary_modes, ask_modes);
 				});
 			} else

@@ -6,7 +6,7 @@ var MyCtrlField = function(config) {
 
 MyCtrlField.prototype = new jsGrid.Field({
 
-	grid_id: "dirs",  // or dir
+	grid_id: "dirs",
 
 	editing: false,
 	inserting: false,
@@ -170,7 +170,9 @@ $(function() {
 	update_grid("dirs", current_dir);
 	update_grid("files", current_dir, true);
 
-	/* editor stuff */
+	/************************************************/
+	/* editor stuff                                 */
+	/************************************************/
 	$("#editorbox").hide();
 
 	editor = ace.edit("editor");
@@ -209,7 +211,6 @@ $(function() {
 		editor_target = null;
 		$("form[name=editor]").attr("action", "");
 		$("form[name=editor] input[name=filename]").val("");
-
 	});
 
 	$("form[name=editor] input[name=close]").click(function(ev) {
@@ -220,14 +221,15 @@ $(function() {
 			$("form[name=editor]").attr("action", "");
 			$("form[name=editor] input[name=filename]").val("");
 		});
-		//$("#" + "editorbox").hide();
 	});
 
 	if (editor_target != null) {
 		show_editor(editor_target, false, true);
 	}
 
+	/************************************************/
 	/* new-dir stuff */
+	/************************************************/
 	$("form[name=newdir]").submit(function(ev) {
 		ev.preventDefault();
 
@@ -250,7 +252,9 @@ $(function() {
 		});
 	});
 
+	/************************************************/
 	/* upload stuff */
+	/************************************************/
 
 	$("#upload").ajaxForm(function(ret) {
 		if (ret.state == "fail") {

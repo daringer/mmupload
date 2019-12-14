@@ -184,9 +184,17 @@ article {
 
 
 
-#flash div .err {
+#flash  .err {
 	background-color: #db02b5bb;
+	border-radius: 0.25em;
 }
+
+#flash .info {
+	background-color: #2f5431bb;
+	border-radius: 0.25em;
+}
+
+
 #flash {
 	background-color: #cccccc;
 	line-height: 2.4em;
