@@ -101,7 +101,8 @@ function show_editor(path, readonly=false, newfile=false) {
 	if (!path.indexOf("/") > -1)
 		path = "/" + path;
 
-	$("#editorbox").css("visibility", "visible").show();
+	//$("#editorbox").css("visibility", "visible").show();
+	$("#editorbox").slideDown("slow");
 	editor.focus();
 
 	$("form[name=editor] label").text(path);
@@ -127,6 +128,7 @@ function show_editor(path, readonly=false, newfile=false) {
 				editor.clearSelection();
 				editor.focus();
 				editor_target = path;
+				$("form[name=editor] label").attr("class", "unchanged");
 			}
 		});
 	}
@@ -283,6 +285,9 @@ function ctrl_action(uid, op) {
 
 function update_grid(grid_id, target) {
 	//$("#" + grid_id).jsGrid("option", "data", []);
+
+	if (target == null && grid_id == "files")
+		target = current_dir;
 
 	if (grid_id == "dirs")
 		update_active_directory(target);

@@ -171,16 +171,15 @@ $(function() {
 	update_grid("files", current_dir, true);
 
 	/* editor stuff */
-
 	$("#editorbox").hide();
 
 	editor = ace.edit("editor");
 	//editor.setTheme("ace/theme/twilight");
 	editor.setTheme("ace/theme/terminal");
 	//editor.session.setMode("ace/mode/javascript");
-	//
+
 	editor.on("change", function(ev) {
-		$("form[name=editor] label").attr("class", "changed");
+		  $("form[name=editor] label").attr("class", "changed");
 	});
 
 	$("form[name=editor] input[name=what]").click(function(ev) {
@@ -198,7 +197,7 @@ $(function() {
 			},
 			success: function(ret) {
 				ret.msgs.forEach(show_message);
-				update_grid("files", "pastebin");
+				update_grid("files", null);
 				$("form[name=editor] label").attr("class", "unchanged");
 			}
 		});
@@ -215,24 +214,20 @@ $(function() {
 
 	$("form[name=editor] input[name=close]").click(function(ev) {
 		ev.preventDefault();
-		editor.setValue("");
 		editor_target = null;
-		$("form[name=editor]").attr("action", "");
-		$("form[name=editor] input[name=filename]").val("");
-
-		$("#" + "editorbox").hide();
+		$("#editorbox").slideUp("slow", function(ev) {
+			editor.setValue("");
+			$("form[name=editor]").attr("action", "");
+			$("form[name=editor] input[name=filename]").val("");
+		});
+		//$("#" + "editorbox").hide();
 	});
 
 	if (editor_target != null) {
 		show_editor(editor_target, false, true);
 	}
 
-/*
-	$("form[name=newpaste] input[name=what]").click(function(ev) {
-	});*/
-
 	/* new-dir stuff */
-
 	$("form[name=newdir]").submit(function(ev) {
 		ev.preventDefault();
 
