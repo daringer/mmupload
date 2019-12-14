@@ -23,6 +23,27 @@ window.addEventListener("popstate", function(ev) {
 });
 */
 
+
+function get_filename(path) {
+   return new String(path).substring(path.lastIndexOf("/") + 1);
+}
+
+function get_dirname(path) {
+	 if (path.lastIndexOf("/") == -1)
+			return path;
+   return new String(path).substring(0, path.lastIndexOf("/"));
+}
+
+function join_paths(...paths) {
+	var out = new String();
+	for(var p of paths)
+		out += "/" + p
+	while(out.indexOf("//") != -1)
+		out = out.replace("//", "/")
+	return out;
+}
+
+
 function show_message(msg, error=false) {
 	if (msg == "None")
 		return;
@@ -76,41 +97,39 @@ function show_preview(path) {
 	});
 }
 
-function show_editor(path, readonly=false) {
+function show_editor(path, readonly=false, newfile=false) {
 	if (!path.indexOf("/") > -1)
 		path = "/" + path;
 
-	$("#" + "_editorbox").css({
-		visibility: "visible",
-		display: "block",
-		opacity: 0.0,
-	});
-	$("#" + "_editorbox").fadeIn(4000);
+	$("#editorbox").css("visibility", "visible").show();
+	editor.focus();
 
-	$.ajax({
-		type: "GET",
-		url: url_prefix + "/get/raw" + path,
-		error: function(ret) {
-			show_error(ret.msg);
-		},
-		success: function(ret) {
-			if (ret.state == "fail") {
-				ret.msgs.forEach(msg => show_error(msg));
-				return;
+	$("form[name=editor] label").text(path);
+	$("form[name=editor] label").attr("class", "unchanged");
+
+
+	if (!newfile) {
+		$.ajax({
+			type: "GET",
+			url: url_prefix + "/get/raw" + path,
+			error: function(ret) {
+				show_error(ret.msg);
+			},
+			success: function(ret) {
+				if (ret.state == "fail") {
+					ret.msgs.forEach(msg => show_error(msg));
+					return;
+				}
+				$("form[name=editor] input[name=contents]").val(ret);
+				$("#editorbox").css({display: "block", visibility: "visible"});
+				editor.$readOnly = readonly;
+				editor.setValue(ret);
+				editor.clearSelection();
+				editor.focus();
+				editor_target = path;
 			}
-			$("form[name=editor] input[name=contents]").val(ret);
-			$("#editorbox").css({display: "block", visibility: "visible"});
-			editor.$readOnly = readonly;
-			editor.setValue(ret);
-			editor.clearSelection();
-			editor.focus();
-			$("form[name=editor_ctrl] input[name=what]").click(function(ev) {
-				$("form[name=editor_ctrl] input[name=contents]").val(editor.getValue());
-				//ev.preventDefault();
-				//alert($("form[name=editor] input[name=contents]").val());
-			});
-		}
-	});
+		});
+	}
 }
 
 function update_active_directory(target) {

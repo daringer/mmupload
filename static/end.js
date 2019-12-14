@@ -19,12 +19,9 @@ MyCtrlField.prototype = new jsGrid.Field({
 
 	render_contents: function(item) {
 		let base_url = "/local/icon/";
-		let suffix = ".svg";
 		let	ctrl_items = [
-			["rename",  "rename-box"],
-			["delete",  "delete"],
-			["confirm", "check"],
-			["cancel",  "close"]
+			["rename",  "rename-box"], ["delete",  "delete"],
+			["confirm", "check"],      ["cancel",  "close"]
 		];
 		if (this.grid_id == "dirs")
 			//ctrl_items.push(...[[null, null], [null, null]]);
@@ -178,27 +175,61 @@ $(function() {
 	$("#editorbox").hide();
 
 	editor = ace.edit("editor");
-	editor.setTheme("ace/theme/twilight");
+	//editor.setTheme("ace/theme/twilight");
+	editor.setTheme("ace/theme/terminal");
 	//editor.session.setMode("ace/mode/javascript");
+	//
+	editor.on("change", function(ev) {
+		$("form[name=editor] label").attr("class", "changed");
+	});
 
 	$("form[name=editor] input[name=what]").click(function(ev) {
-		$("form[name=editor] input[name=data]").val(editor.getValue());
-	});
-	$("form[name=editor] input[name=clear]").click(function(ev) {
-		editor.setValue("");
-	});
-	$("form[name=editor] input[name=hide]").click(function(ev) {
-		editor.setValue("");
-		$("#editorbox").hide();
-		$("form[name=newpaste] input[name=what]").show();
+		ev.preventDefault();
+		$.ajax({
+			type: "POST",
+			url: join_paths("/new", get_dirname(editor_target)),
+			data: { what: "savenew",
+							filename: get_filename(editor_target),
+							data: editor.getValue()
+			},
+			error: function(ret) {
+				show_error(`failed saving file {editor_target}`);
+				ret.msgs.forEach(show_message);
+			},
+			success: function(ret) {
+				ret.msgs.forEach(show_message);
+				update_grid("files", "pastebin");
+				$("form[name=editor] label").attr("class", "unchanged");
+			}
+		});
 	});
 
-	$("form[name=newpaste] input[name=what]").click(function(ev) {
-		$("#editorbox").css("visibility", "visible").show();
-		editor.focus();
-		$("form[name=newpaste] input[name=what]").hide();
+	$("form[name=editor] input[name=clear]").click(function(ev) {
 		ev.preventDefault();
+		editor.setValue("");
+		editor_target = null;
+		$("form[name=editor]").attr("action", "");
+		$("form[name=editor] input[name=filename]").val("");
+
 	});
+
+	$("form[name=editor] input[name=close]").click(function(ev) {
+		ev.preventDefault();
+		editor.setValue("");
+		editor_target = null;
+		$("form[name=editor]").attr("action", "");
+		$("form[name=editor] input[name=filename]").val("");
+
+		$("#" + "editorbox").hide();
+	});
+
+	if (editor_target != null) {
+		show_editor(editor_target, false, true);
+	}
+
+/*
+	$("form[name=newpaste] input[name=what]").click(function(ev) {
+	});*/
 
 	/* new-dir stuff */
 

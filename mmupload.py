@@ -127,12 +127,16 @@ def create(dirname=""):
                 filename = filedb.create_file(dirname, req_file)
                 msg = f"Saved to: {filename}"
 
-        elif request.form.get("what") == "save":
+        elif request.form.get("what") in ["save", "savenew"]:
             app.config["UPLOADS_FILES_DEST"] = filedb.get_path(dirname)
-            filename = filedb.update_file(dirname,
-              request.form.get("filename"), request.form.get("contents"))
-            msg = f"Updated file: {filename}"
-
+            if filedb.isfile(os.path.join(dirname, request.form.get("filename"))):
+                filename = filedb.update_file(dirname,
+                    request.form.get("filename"), request.form.get("data"))
+                msg = f"Updated file: {filename}"
+            else:
+                filename = filedb.create_raw_file(dirname,
+                    request.form.get("filename"), request.form.get("data"))
+                msg = f"Created file: {filename}"
         else:
             msg = "invalid request"
             state = "fail"
@@ -259,34 +263,29 @@ def file_get_helper(target, raw=False):
 def shorties(s_id):
     rel_path = filedb.get_short_from_yaml(s_id)
     if not rel_path:
-        return jsonify({"msg": f"invalid request", "state": "fail"})
+        #return jsonify({"msg": f"invalid request", "state": "fail"})
+        return redirect(url_for("custom_err", code=404))
     return file_get_helper(rel_path)
+
+@app.route("/err/<int:code>", methods=["GET"])
+def custom_err(code):
+   desc = {
+     404: "Not Found",
+     403: "Not Allowed",
+   }.get(code, "")
+   return render_template("custom_err.html", err_code=code, err_desc=desc)
 
 
 #### @TODO: same here -> rework!!!!
 #@app.route("/pastebin", methods=["GET", "POST"])
-@app.route("/pastebin", methods=["POST"])
+@app.route("/pastebin", methods=["GET"])
 def pastebin():
     targetdir = "pastebin"
-    if request.method == "POST":
-        if not filedb.isdir(targetdir):
-            filedb.create_dir("", targetdir)
+    uid = str(create_uid())[:8]
+    while uid in filedb.get_contents(targetdir):
         uid = str(create_uid())[:8]
-        while uid in filedb.get_contents(targetdir):
-            uid = str(create_uid())[:8]
-        paste_data = request.form.get("data")
-        path = filedb.create_raw_file(targetdir, uid, paste_data)
-        url = os.path.join(URL_PREFIX, "pastebin", uid)
-
-        filedb.update_meta_in_yaml(os.path.join("pastebin", uid), uid)
-
-        my_msg = f"saved pasted data, url: {url}"
-        if request.form.get("paste_from") == "editor":
-            return redirect(url_for("show", dirname="pastebin", msg=my_msg))
-        else:
-            return jsonify({"msg": my_msg, "state": "ok"})
-    #else:
-    #    return render_page("", tmpl="pastebin.html")
+    targetpath = os.path.join(targetdir, uid)
+    return render_page(editor_target=targetpath, dirname=targetdir)
 
 ############
 ## just write / load database

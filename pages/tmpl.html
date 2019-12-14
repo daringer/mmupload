@@ -43,16 +43,44 @@
 	var uid_editing = null;
 
 	var editor = null;
+	{% if editor_target %}
+	var editor_target = "{{ editor_target }}";
+	{% else %}
+	var editor_target = null;
+	{% endif %}
 
 </script>
 
 <body>
 
 <article>
+	<div id=flash class=toplvlbox></div>
+</article>
+<article>
 	<div id=curpath class=toplvlbox></div>
 </article>
-
 <main>
+
+	<article>
+		<div id=editorbox style="visibility: hidden; display: none;">
+			<div id=editor_ctrl class=sublvlbox>
+				<form method=POST name=editor
+						  action="{{ url_for('create', dirname=base_dir) }}">
+					<!-- input type=image src="{{ url_for('get_icon', icon='format-clear') }}" name=clear value=clear /-->
+					<input type=image src="{{ url_for('get_icon', icon='content-save') }}" name=what value=save />
+					<input type=image src="{{ url_for('get_icon', icon='window-close') }}" name=close value=close />
+					<label class=unchanged></label>
+					<!-- input type=image src="{{ url_for('get_icon', icon='copy') }}" name=copyurl value=copy-url /-->
+					<input type=hidden name=filename />
+		  		<input type=hidden name=data />
+				</form>
+			</div>
+	  	<div id=editor></div>
+		</div>
+		<div id=previewbox style="visibility: hidden; display: none;">
+			<img src="" />
+		</div>
+	</article>
 
 	<article>
 		<div id=dirs class=toplvlbox></div>
@@ -86,31 +114,12 @@
 					<input type=submit value="new pastebin" name=what />
 				</form>
 			</div-->
-			<div id=editor_ctrl class=sublvlbox>
-				<form method=GET name=editor_ctrl action="{{ url_for("create", dirname=base_dir) }}">
-					<label>editor control:</label>
-					<input type=button name="new" value="new paste" />
-					<input type=button name="clear" value="clear & close" />
-					<input type=submit name="what" value="save data" />
-		  		<input type=hidden name=data />
-					<input type=hidden name=paste_from value=editor />
-				</form>
-			</div>
-		</div>
+					</div>
 	</article>
 
-	<article>
-		<div id=editorbox style="visibility: hidden; display: none;">
-	  	<div id=editor></div>
-		</div>
-		<div id=previewbox style="visibility: hidden; display: none;">
-			<img src="" />
-		</div>
-	</article>
 
-	<article>
-		<div id=flash class=toplvlbox></div>
-	</article>
+
+
 
 </main>
 
@@ -118,54 +127,4 @@
 	type="text/javascript" charset="utf-8"></script>
 
 </body>
-
-{#
-
-{% if show_files and files %}
-<div id=files class=box>
-<ul>
-{% for target, path, filesize in files %}
-	<li class=file_item>
-  	<a class=name href="{{ url_for("get_file", target=path) }}">{{ target }}</a>
-		<span class=info>{{ filesize }}</span>
-		<a class=action href="{{ url_for("delete", target=path) }}">delete</a>
-		{% if show_editor and path == editor_target %}
-  		<form method=POST action="{{ url_for("create", dirname=base_dir) }}" name="editor">
-  		<input type=hidden name=filename value="{{ target }}" />
-	  	<input type=hidden name=contents value="" />
-			<input type=submit value=save name=what />
-	  	</form>
-		{% else %}
-  		<a class=action href="{{ url_for("edit", target=path) }}">edit</a>
-		{% endif %}
-	</li>
-	{% if show_editor and path == editor_target %}
-	  <pre id="editor"></pre>
-			<script src="{{ url_for("get_static", target="ace/src-min/ace.js") }}" type="text/javascript" charset="utf-8"></script>
-	  <script>
-      //editor.session.setMode("ace/mode/javascript");
-
-			$(function() {
-				$.ajax({
-					type: "GET",
-					url: "{{ url_for('get_raw_file', target=path) }}",
-					error: function() {
-						show_message("error getting raw file contents... DO NOT SAVE (@todo)", true);
-					},
-					success: function(ret, url) {
-						$("form[name=editor] input[name=contents]").val(ret);
-						editor.setValue(ret);
-						editor.clearSelection();
-					}
-				});
-			});
-
-	  </script>
-	{% endif %}
-{% endfor %}
-</ul>
-</div>
-{% endif %}
-#}
-
 
