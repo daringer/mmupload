@@ -182,7 +182,23 @@ article {
 	height: 400px;
 }
 
+#previewbox {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: 100%;
+	background-color: #000000cf;
+	z-index: 10000;
+}
 
+#previewbox img {
+	padding-top: 5%;
+	margin: auto;
+	display: flex;
+	max-height: 90%;
+	max-width: 90%;
+}
 
 #flash  .err {
 	background-color: #db02b5bb;

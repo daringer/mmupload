@@ -267,6 +267,14 @@ $(function() {
 		$("form[name=upload] input[type=file]").val("");
 	});
 
+	/************************************************/
+	/* preview stuff */
+	/************************************************/
+
+	$("#previewbox").hide();
+	$("#previewbox").click(function(ev) {
+		$("#previewbox").fadeOut("slow");
+	});
 });
 
 

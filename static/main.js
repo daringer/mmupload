@@ -82,19 +82,11 @@ function readable_size(size) {
 }
 
 function show_preview(path) {
-	$.ajax({
-		type: "GET",
-		url: url_prefix + "/get/raw" + path,
-		error: function(ret) {
-			show_error(ret.msg);
-		},
-		success: function(ret) {
-			if (ret.state == "fail") {
-				ret.msgs.forEach(msg => show_error(msg));
-				return;
-			}
-		}
-	});
+	if (!path.indexOf("/") > -1)
+		path = "/" + path;
+
+	$("#previewbox").fadeIn("slow");
+	$("#previewbox img").attr("src", join_paths("/get/download/", path));
 }
 
 function show_editor(path, readonly=false, newfile=false) {
@@ -102,14 +94,16 @@ function show_editor(path, readonly=false, newfile=false) {
 		path = "/" + path;
 
 	//$("#editorbox").css("visibility", "visible").show();
-	$("#editorbox").slideDown("slow");
-	editor.focus();
 
 	$("form[name=editor] label").text(path);
 	$("form[name=editor] label").attr("class", "unchanged");
 
-
-	if (!newfile) {
+	if (newfile) {
+			$("#editorbox").slideDown("slow");
+			$("form[name=editor] label").attr("class", "unchanged");
+			$("#editorbox").css({display: "block", visibility: "visible"});
+			editor.focus();
+	} else {
 		$.ajax({
 			type: "GET",
 			url: url_prefix + "/get/raw" + path,
@@ -121,6 +115,8 @@ function show_editor(path, readonly=false, newfile=false) {
 					ret.msgs.forEach(msg => show_error(msg));
 					return;
 				}
+				$("#editorbox").slideDown("slow");
+				editor.focus();
 				$("form[name=editor] input[name=contents]").val(ret);
 				$("#editorbox").css({display: "block", visibility: "visible"});
 				editor.$readOnly = readonly;
@@ -133,6 +129,7 @@ function show_editor(path, readonly=false, newfile=false) {
 		});
 	}
 }
+
 
 function update_active_directory(target) {
 	$("#curpath").empty();
