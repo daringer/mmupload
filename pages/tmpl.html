@@ -92,9 +92,7 @@
 	</article>
 
 	<article>
-		<div id=tools class=toplvlbox>
-
-			<div id=newdir class=sublvlbox>
+			<div id=newdir class=toplvlbox>
 			  <form method=POST action="{{ url_for("create", dirname=base_dir) }}"
 			  			name=newdir>
 				  <label>new directory:</label>
@@ -103,7 +101,7 @@
 			  </form>
 		  </div>
 
- 		  <div id=upload class=sublvlbox>
+ 		  <div id=upload class=toplvlbox>
  			  <form method=POST enctype=multipart/form-data method="post"
 				  	  action="{{ url_for("create", dirname=base_dir) }}" name=upload>
 				  <label>upload file:</label>
@@ -118,7 +116,6 @@
 					<input type=submit value="new pastebin" name=what />
 				</form>
 			</div-->
-					</div>
 	</article>
 
 

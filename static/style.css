@@ -116,7 +116,12 @@ a.uniquelink {
 
 }
 
-#files, #dirs, #curpath, #tools { }
+#files, #dirs, #curpath { }
+
+#newdir, #upload {
+	width:10000em;
+}
+
 
 #editorbox {
 	background-color: #cccccc;
@@ -127,7 +132,6 @@ a.uniquelink {
 .sublvlbox {
 	padding-right: 20px;
 	margin-left: 20px;
-	border-right: 1px solid #7a7a7a;
 }
 .sublvlbox:first-child {
 	margin-left: 5px;
@@ -153,24 +157,40 @@ article {
 }
 
 @media only screen and (max-width: 1279px) {
-	#files, #dirs, #curpath, #tools, #editorbox {
+	#files, #dirs, #curpath, #editorbox, #newdir, #upload {
 		width: 100%;
+		border-top: solid 0.33em #bababc;
+	}
+	#flash {
+		width: 100%;
+		background-color: #cccccc;
+		line-height: 2.4em;
+		padding: 6px;
 	}
 }
 /*** screens < 1280px (smartphones) */
 @media only screen and (min-width: 1280px) {
-	#dirs {
+	#dirs, #newdir {
+		display: table-cell;
+		min-width: 450px;
+		margin-top: 10px;
+		border-right: solid 0.33em #bababc;
+	}
+	#files, #upload {
 		display: table-cell;
 		min-width: 250px;
-		border-right: 1.3px solid #7a7a7a;
-		height: 50vh !important;
-	}
-	#files {
-		display: table-cell;
-		min-width: 250;
 		vertical-align: top;
-		height: 50vh !important;
 	}
+	#dirs, #files {
+		height: 30vh !important;
+	}
+	#flash {
+		background-color: #cccccc;
+		line-height: 2.4em;
+		padding: 6px;
+	}
+
+
 }
 
 #tools {
@@ -211,13 +231,7 @@ article {
 }
 
 
-#flash {
-	background-color: #cccccc;
-	line-height: 2.4em;
-	padding: 6px;
-	/*width: 100%;*/
 
-}
 #flash div {
 	font-weight: bold;
 	background-color: #9a5f66;
