@@ -349,7 +349,7 @@ function update_grid(grid_id, target) {
 			if ($("#dirs table tbody tr:first td:first").text() == "..") {
 				$("#dirs table tbody tr:first td:last").text("");
 				$("#dirs table tbody tr:first td:first").click(function(e) {
-					window.location = "/dir/" + current_dir.split("/").slice(0, -1).join("/");
+					window.location = url_prefix + "/dir/" + current_dir.split("/").slice(0, -1).join("/");
 				});
 
 			}

@@ -85,7 +85,7 @@ def get_static(target=""):
     if ".." in target:
         return;
 
-    p = os.path.join("static", target)
+    p = os.path.join(URL_PREFIX, "static", target)
     data = None
     with open(p, "r") as fd:
         data = fd.read()
@@ -97,7 +97,7 @@ def get_icon(icon):
     if ".." in icon:
         return;
 
-    p = os.path.join("static", "icons", "svg", icon + ".svg")
+    p = os.path.join(URL_PREFIX, "static", "icons", "svg", icon + ".svg")
     data = None
     with open(p, "r") as fd:
         data = fd.read()
@@ -151,7 +151,7 @@ def create(dirname=""):
 @requires_auth
 def show(dirname=""):
     #return render_page(dirname, msgs=[request.args.get("msg")])
-    print (list(request.args), request.args.get("msg"))
+    #print (list(request.args), request.args.get("msg"))
     return render_page(dirname, msgs=[request.args.get("msg")])
 
 
@@ -188,7 +188,6 @@ def ls(what, dirname=""):
     return jsonify(data)
 
 
-### @TODO: RE-WORK !!!!
 @app.route("/edit/<path:target>", methods=["GET"])
 @requires_auth
 def edit(target):
