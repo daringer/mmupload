@@ -18,7 +18,7 @@ MyCtrlField.prototype = new jsGrid.Field({
 	},
 
 	render_contents: function(item) {
-		let base_url = "/local/icon/";
+		let base_url = url_prefix + "/local/icon/";
 		let	ctrl_items = [
 			["rename",  "rename-box"], ["delete",  "delete"],
 			["confirm", "check"],      ["cancel",  "close"]
