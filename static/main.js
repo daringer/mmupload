@@ -86,7 +86,7 @@ function show_preview(path) {
 		path = "/" + path;
 
 	$("#previewbox").fadeIn("slow");
-	$("#previewbox img").attr("src", join_paths("/get/download/", path));
+	$("#previewbox img").attr("src", join_paths(url_prefix, "/get/download/", path));
 }
 
 function show_editor(path, readonly=false, newfile=false) {

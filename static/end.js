@@ -188,7 +188,7 @@ $(function() {
 		ev.preventDefault();
 		$.ajax({
 			type: "POST",
-			url: join_paths("/new", get_dirname(editor_target)),
+			url: join_paths(url_prefix, "/new", get_dirname(editor_target)),
 			data: { what: "savenew",
 							filename: get_filename(editor_target),
 							data: editor.getValue()
