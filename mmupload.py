@@ -85,7 +85,7 @@ def get_static(target=""):
     if ".." in target:
         return;
 
-    p = os.path.join(URL_PREFIX, "static", target)
+    p = os.path.join("static", target)
     data = None
     with open(p, "r") as fd:
         data = fd.read()
@@ -97,7 +97,7 @@ def get_icon(icon):
     if ".." in icon:
         return;
 
-    p = os.path.join(URL_PREFIX, "static", "icons", "svg", icon + ".svg")
+    p = os.path.join("static", "icons", "svg", icon + ".svg")
     data = None
     with open(p, "r") as fd:
         data = fd.read()

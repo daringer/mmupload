@@ -50,7 +50,7 @@ function show_message(msg, error=false) {
 
 	var el = document.createElement("div");
 	var ic = document.createElement("img");
-	$(ic).attr("src", "/local/icons/svg/exclamation.svg");
+	$(ic).attr("src", url_prefix + "/local/icons/svg/exclamation.svg");
 	$(ic).css({
 		position: "relative",
 		left: "-2px",
