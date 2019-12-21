@@ -7,6 +7,9 @@ Add bugs/todos here (change order for priority)
 	- url-shortening outsourcing to micro-rest-service!? (well, no, really??? benefits ???)
 
 - create new/empty file
+ 
+- https://github.com/blueimp/jQuery-File-Upload
+
 
 DONE:
 
