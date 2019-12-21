@@ -10,3 +10,6 @@
 [submodule "static/icons"]
 	path = static/icons
 	url = https://github.com/Templarian/MaterialDesign.git
+[submodule "static/jQuery-File-Upload"]
+	path = static/jQuery-File-Upload
+	url = https://github.com/blueimp/jQuery-File-Upload.git
