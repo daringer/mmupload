@@ -1,26 +1,23 @@
 Add bugs/todos here (change order for priority)
 
-- handle browser reload
-- add editor function again
-- thumbnails for images
-- preview for images
 - (mobile) pull to reload  -> https://github.com/BoxFactura/pulltorefresh.js
 - (mobile) resize
-- control:
-	- keep edit + delete, but update icons
-	- preview: add new col and icon and preview 
-	- edit contents: add new col and icon 
 
-- make files public
+- make shortened url for any file => DONE (well yes)
+	- url-shortening outsourcing to micro-rest-service!? (well, no, really??? benefits ???)
 
-- make shortened url for any file
-	- url-shortening outsourcing to micro-rest-service!?
-
-- allow usage as pastebin
-
-
-
+- create new/empty file
 
 DONE:
 
+- make files public => DONE (using shorties + /s/...)
 - file sizes human readable
+- handle browser reload => DONE (no more single-page)
+- add editor function again => DONE (theme still not matching)
+- thumbnails for images => DONE (preview)
+- preview for images => DONE (preview)
+- allow usage as pastebin => /pastebin
+- control: => DONE
+	- keep edit + delete, but update icons
+	- preview: add new col and icon and preview 
+	- edit contents: add new col and icon 
