@@ -263,7 +263,7 @@ article {
 .jsgrid-cell, .jsgrid-row>.jsgrid-cell, .jsgrid-alt-row>.jsgrid-cell, .jsgrid-edit-row,
 .jsgrid-header-row>.jsgrid-header-cell, .jsgrid-nodata-row>.jsgrid-cell, .jsgrid-edit-row>.jsgrid-cell {
 	background-color: unset;
-	overflow: overlay; /* previously "unset" */
+	overflow: hidden;
 	border: 0;
 	border-top: 1px dotted #bebebe;
 	margin: 2px;
