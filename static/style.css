@@ -87,11 +87,31 @@ label {
 	width: 1.5em;
 	margin-left: 1.0em;
 	opacity: 0.35;
+	border-radius: 4px;
 }
 .icon:hover {
 	background-color: #ababab;
 	opacity: 1.0;
 }
+
+.icon_confirm {
+	margin-right:20px;
+	background-color: #469600;
+}
+.icon_confirm:hover {
+	margin-right:20px;
+	background-color: #469600;
+	opacity: 0.7;
+}
+.icon_cancel {
+	background-color: #a04010;
+}
+.icon_cancel:hover {
+	background-color: #a04010;
+	opacity: 0.7;
+}
+
+
 a.uniquelink {
 	margin: 0;
 	padding: 0;

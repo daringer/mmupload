@@ -34,7 +34,7 @@ MyCtrlField.prototype = new jsGrid.Field({
 			"<div class=iconbox id='iconbox_" + item.uid + "_" + data[0] +
 			"' onclick='ctrl_action(\"" + item.uid + "\", \"" + data[0] + "\");'" +
 			"  onload='show_mode(\"" + item.active_mode + "\");' >" +
-			"<img src='" + base_url + data[1] + "' class='icon' alt='" +
+			"<img src='" + base_url + data[1] + "' class='icon icon_" + data[0] + "' alt='" +
 			data[0] + "' />" +
 			"<span class=tooltip>" + data[0] + "</span>" +
 			"</div>"
