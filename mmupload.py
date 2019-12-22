@@ -242,7 +242,7 @@ def file_get_helper(target, raw=False):
                 out = fd.read()
             return out
         else:
-            return send_file(fn, mimetype=mime_info[0])
+            return send_file(fn, mimetype=mime_info[0], as_attachment=True)
 
     except FileDBError as e:
         msg = repr(e)
