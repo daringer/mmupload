@@ -5,8 +5,8 @@ from functools import wraps
 import hashlib
 import mimetypes
 
-from flask import Flask, render_template, request, flash, redirect, Response, url_for, send_file
-from flask import Blueprint, render_template, jsonify
+from flask import Flask, render_template, request, flash, redirect, Response, \
+    url_for, send_file, Blueprint, render_template, jsonify
 
 from werkzeug.utils import secure_filename
 
