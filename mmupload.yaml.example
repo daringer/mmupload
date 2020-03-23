@@ -7,7 +7,9 @@
 
 # url prefix (directory)
 url_prefix: /
-
+# static url prefix, will be used for nginx "X-Accel-Redirect"
+# -> if not set, then flask will serve the files using 'send_file'
+#static_url_prefix: /mmdownload
 
 secret_key: 123456123456123456
 

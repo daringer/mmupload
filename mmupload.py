@@ -30,6 +30,8 @@ URL_PREFIX = cfg.get("url_prefix", "/")
 if URL_PREFIX == "/":
     URL_PREFIX = ""
 
+STATIC_URL_PREFIX = cfg.get("static_url_prefix")
+
 # flask init
 app = Flask(__name__)
 app.secret_key = cfg["secret_key"]
@@ -242,7 +244,11 @@ def file_get_helper(target, raw=False):
                 out = fd.read()
             return out
         else:
-            return send_file(fn, mimetype=mime_info[0], as_attachment=True)
+            if STATIC_URL_PREFIX:
+                return Response(mimetype=mime_info[0], 
+                        headers={"X-Accel-Redirect": os.path.join(STATIC_URL_PREFIX, target)})
+            else:
+                return send_file(fn, mimetype=mime_info[0], as_attachment=True)
 
     except FileDBError as e:
         msg = repr(e)
