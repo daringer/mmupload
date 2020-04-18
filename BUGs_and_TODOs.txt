@@ -1,31 +1,49 @@
 Add bugs/todos here (change order for priority)
 
-- (mobile) resize (??) happens already, does it?!
+- Generic:
+
+	=> create new/empty file (jup: /edit/path/to/not/existing/file) (DONE!)
+		 => need new form next to upload to just put a filename in and it will
+		    do action=/edit/<my_new_filename>
+
+	=> better uploading: https://github.com/blueimp/jQuery-File-Upload
+
+	=> on "rename" enter/esc should do the right thing => ok / cancel
+
+	=> continue ctrl_action/ctrl_icons refactoring:
+		 => derive state of each row's ctrl-icon using the item's internal
+		    state(s) allow css/icon/hover/(de)activation depending on state
+	   => best case any action does not care about the icons, but only sets
+		    internal item state and the icons react accordingly
 
 
-- create new/empty file
-
-- https://github.com/blueimp/jQuery-File-Upload
-
-- on "rename" enter/esc should do the right thing => ok / cancel
+- Mobile:
+	=> increase icon size
+	=> proper table resize (currently "ok")
+  => smarter smart-device recognition (currently only by window-width)
 
 - Communications:
-	-> generic json-received data handler
-	   -> parse for "state", react accordingly
-		 -> parse for "msg"
-		 -> any non-fail is the only function-callback to be provided here
+	=> generic json-received data handler
+	   => parse for "state", react accordingly
+		 => parse for "msg"
+		 => any non-fail is the only function-callback to be provided here
 
-  -> generic ajax-sending (??) somehow not, but might be necessary due to
+  => generic ajax-sending (??) somehow not, but might be necessary due to
 	   json-receiver generalization ???
 
-	->
+	=> how to properly get URLs to the frontend, some object related
+		 (see mmupload::ls()) are working good, but what about templates? or have
+		 a generic "/url_for/endpoint?param1=foo&param2=blub" endpoint which can
+		 be asked for an url anytime?
+
+	=> loading indicator ?!
 
 
 - Database:
 	=> CRITICAL: MAIN FLAW: currently too many users on the same mmupload instance
 		 will likely break the yaml-db-file due to possible parallel reads/writes
 
-	-> YAML is somehow nice, but also sucks like hell, I see two ways from here:
+	=> YAML is somehow nice, but also sucks like hell, I see two ways from here:
 	   => keep it as simple as it is now and just change the following:
 		    - more convinience features despite load_config/save_config, especially
 					more granulation in loading & saving
@@ -39,41 +57,28 @@ Add bugs/todos here (change order for priority)
 
 		 => go the bigger loop and search for an one-file-yaml-database abstraction
 		    library (does this exist?), features needed:
-				-> thread-safe db access
-				-> no extra daemon/process, must run within any thread as library
-				-> minimalistic querying capabilities (in fact dict()-api is enough)
-				-> ....
+				=> thread-safe db access
+				=> no extra daemon/process, must run within any thread as library
+				=> minimalistic querying capabilities (in fact dict()-api is enough)
+				=> ....
 
-- Messages
+- Layout / Formatting / Fancyness / Messages
 	=> we need a consistent message scheme and less cryptic ones would also be
 		 nice!
+  => highlight ctrl-icons if action is active!
+	=> show tree size in dir view
+	=> show if tree-items are public in dir view
+	=> add something meaningful into the header row/cell (title??)
+  => deactivate "edit" and "preview" for not-supported mimetypes
+  => make table less jumpy after reload (hide first and then slide-in ???)
+
+- Editor:
+	=> make edit-cancel more user-friendly:
+	   => ask to save and open new file?
+		 => automatically save and open?
+		 => auto close, if not changed + ask for save if needed?
 
 
-DONE:
 
-- make files public => DONE (using shorties + /s/...)
 
-- file sizes human readable
 
-- handle browser reload => DONE (no more single-page)
-
-- add editor function again => DONE (theme still not matching)
-
-- thumbnails for images => DONE (preview)
-
-- preview for images => DONE (preview)
-
-- allow usage as pastebin => /pastebin -> NOOOOO !!!! ALSO outsource!!!!
-
-- control: => DONE
-	- keep edit + delete, but update icons
-	- preview: add new col and icon and preview
-	- edit contents: add new col and icon
-
-- (mobile) pull to reload  -> https://github.com/BoxFactura/pulltorefresh.js
-	=> DONE, just remove: body {overflow: hidden } CSS
-
-- make shortened url for any file => DONE (well yes) NOOOO!!!!
-	- url-shortening outsourcing to micro-rest-service!? (YES, integrate later)
-
-- simple "public" toggle using control - icons.... DONE DONE
