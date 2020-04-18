@@ -74,11 +74,12 @@ function readable_size(size) {
 	var unit_idx = 0;
 	var units = {0: "B", 1: "KB", 2: "MB", 3: "GB"};
 	var out_size = size;
-	while (out_size > 1024 || unit_idx == 0) {
+	while (out_size > 1024) { // || unit_idx == 0) {
 		out_size = out_size / 1024.;
 		unit_idx++;
 	}
-	return out_size.toFixed(3) + " " + units[unit_idx];
+
+	return out_size.toFixed((unit_idx == 0) ? 0 : 2) + " " + units[unit_idx];
 }
 
 function show_preview(path) {
@@ -130,6 +131,47 @@ function show_editor(path, readonly=false, newfile=false) {
 	}
 }
 
+function toggle_public(item) {
+
+		let new_is_public = (item.zones.indexOf("pub") == -1);
+
+		let my_url = (!new_is_public) ? 
+			url_prefix + `/meta/${item.path}/del/zones` : 
+			url_prefix + `/meta/${item.path}/set/zones/list/pub`;
+	
+		$.ajax({ 
+			type: "POST",
+			url: my_url,
+			error: function() {
+				show_message(`error adding 'pub' to ${x.path}'s zones`);
+			},
+			success: function(ret) {
+				if (ret.state == "ok") {
+					show_message(ret.msg);
+
+					/* OVERALL TODO: we should have the possibility to update a 
+					 * single ITEM from the backend 
+					 * (and update the frontend) 
+		 			 */
+
+					item.zones = ret.meta.zones || new Array();
+					set_icon_public(item);
+
+				} else  
+					show_error(ret.msg);
+			}
+		});
+}
+
+function set_icon_public(item) {
+		if (item.zones.indexOf("pub") == -1)
+				$("#iconbox_" + item.uid + "_public img")
+					.css("background-color", "inherit");
+		else
+				$("#iconbox_" + item.uid + "_public img")
+					.css("background-color", "#33cc33");
+}
+
 
 function update_active_directory(target) {
 	$("#curpath").empty();
@@ -177,7 +219,7 @@ function update_active_directory(target) {
 
 function show_mode(mymode) {
 	// set icon-visibility mode for all items
-	let p_modes = ["edit", "rename", "delete", "preview"];
+	let p_modes = ["edit", "rename", "delete", "preview", "public"];
 	let a_modes = ["confirm", "cancel"];
 	if (a_modes.indexOf(mymode) > -1)
 		Object.keys(uid2item).forEach((uid) => show_ctrls(uid, a_modes, p_modes));
@@ -194,7 +236,7 @@ function show_ctrls(uid, show_ops, hide_ops) {
 }
 
 function ctrl_action(uid, op) {
-	let primary_modes = ["rename", "delete", "edit", "preview"];
+	let primary_modes = ["rename", "delete", "edit", "preview", "public"];
 	let ask_modes = ["confirm", "cancel"];
 	let all_modes = primary_modes.concat(ask_modes);
 
@@ -209,7 +251,7 @@ function ctrl_action(uid, op) {
 		x.last_mode = x.active_mode;
 		x.active_mode = null;
 		show_ctrls(x.uid, primary_modes, ask_modes);
-	} else { //if (op == "delete" || op == "rename") {
+	} else { 
 		x.last_mode = null;
 		x.active_mode = op;
 		if (["delete", "rename", null].indexOf(op) > -1)
@@ -218,7 +260,8 @@ function ctrl_action(uid, op) {
 
 	if (x.active_mode == "rename") {
 		if(uid_editing && (uid_editing != x.uid && x.last_mode == null))
-			ctrl_action(uid_editing, "cancel");
+				ctrl_action(uid_editing, "cancel");
+
 		//let focus_cell = $("#" + x.uid + "_name").closest("td");
 		$("#" + uid2grid_id[uid]).jsGrid("editItem", x);
 		show_ctrls(uid, ask_modes, primary_modes);
@@ -250,6 +293,10 @@ function ctrl_action(uid, op) {
 			show_ctrls(uid, primary_modes, ask_modes);
 		}	else
 			show_error(`mimetype: ${x.mimetype} not yet preview-able...`);
+	}
+
+	if (x.active_mode == "public") {
+		toggle_public(x);
 	}
 
 	if (x.active_mode == null) {
@@ -342,6 +389,8 @@ function update_grid(grid_id, target) {
 					uid2grid_id[x.uid] = grid_id;
 
 					show_ctrls(x.uid, [], ["confirm", "cancel"]);
+
+					set_icon_public(x);
 
 				});
 			});

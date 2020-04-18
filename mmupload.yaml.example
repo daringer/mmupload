@@ -22,27 +22,20 @@ pwd: e65f7d97553794849e6ebfc079d937ab0462fda709d56cab3bf54eae3a4f0564
 
 # there are 2 zones for now:
 zones:
-  # - one public
+  # - one public (available already)
   pub:
-  # - one with user/pass entry
-  zname:
+  # - one with user/pass entry (WARNING: not implemented yet)
+  myfancyzone:
     user: hossa
     pwd: blubinserthereapassastheonefortheadmin
 
 paths:
   'files/README.mdasd':
-    short: abc
     zones:
       - pub
-  'files/setup.py':
-    short: blub
-    zones:
-      - pub
-      - zname
-  'files/wsgi.py':
-    short: fickfuck
   'files/wsgi.ini':
-    short: blabla
+    zones:
+		  - pub
 
 
 

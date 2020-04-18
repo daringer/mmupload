@@ -27,8 +27,11 @@ MyCtrlField.prototype = new jsGrid.Field({
 			//ctrl_items.push(...[[null, null], [null, null]]);
 		{}
 		else
-			ctrl_items.push(...[["edit", "pencil"],
-				["preview", "magnify"]]);
+			ctrl_items.push(...[
+				["edit", "pencil"],
+				["preview", "magnify"],
+				["public", "earth"]
+			]);
 
 		var htmls = ctrl_items.map((data, idx) =>
 			"<div class=iconbox id='iconbox_" + item.uid + "_" + data[0] +
@@ -124,12 +127,13 @@ var file_grid = $("#files").jsGrid({
 	fields: [
 		{ name: "name", title: "Name", type: "text", width: 200 },
 		{ name: "path", type: "text", visible: false},
-		{ name: "short", title: "short-url", type: "text", width: 200},
-		/* { name: "zones", type: "text", visible: false}, */
+		//{ name: "short", title: "short-url", type: "text", width: 200},
+		//{ name: "zones", type: "text", visible: true},
 		{ name: "mimetype", type: "text", visible: false},
 		{ name: "move_url", type: "text", visible: false},
 		{ name: "delete_url", type: "text", visible: false},
 		{ name: "click_url", type: "text", visible: false},
+		//{ name: "
 		{ name: "size", title: "Size", type: "text", align: "left", width: 150,
 			readOnly: true, editing: false},
 		{ name: "ctrl", title: "", type: "myctrl", grid_id: "files", width: 160}
@@ -142,7 +146,7 @@ var file_grid = $("#files").jsGrid({
 		if (args.item.name != "")
 			$.ajax({
 				type: "POST",
-				data: { new_target: args.item.name, new_short: args.item.short },
+				data: { new_target: args.item.name },
 				url: args.item.move_url,
 				error: function() { show_error("error moving"); },
 				success: function(ret) {

@@ -66,6 +66,7 @@ def http_authenticate():
       "WWW-Authenticate": 'Basic realm="Login Required"'}
     )
 
+# decorator for authenticated access
 def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -76,6 +77,9 @@ def requires_auth(f):
     return decorated
 requires_zone_auth = requires_auth
 
+# dummy decorator for non-authenticated access
+def no_auth(f):
+    return f
 
 ####
 #### endpoints
@@ -164,7 +168,7 @@ def ls(what, dirname=""):
     raw_list = map(lambda p: {
             "name": p,
             "path": os.path.join(dirname, p),
-            "meta": filedb.get_meta_from_yaml(os.path.join(dirname, p))
+            "meta": filedb.load_path_meta(os.path.join(dirname, p))
         },
         filedb.get_dirs(dirname) if what == "dirs" else \
         filedb.get_files(dirname))
@@ -176,8 +180,7 @@ def ls(what, dirname=""):
           "uid": str(create_uid())[:8],
           "mimetype": get_mime(dct["path"]),
           "size": filedb.get_size(dct["path"]),
-          #"zones": ",".join(z[0] for z in dct["meta"].get("zones")),
-          "short": dct["meta"].get("short"),
+          "zones": dct["meta"].get("zones", []),
           "delete_url": url_for("delete", target=dct["path"]),
           "move_url": url_for("move", target=dct["path"]),
           "click_url": url_for("ls", what=what, dirname=dct["path"]) \
@@ -198,7 +201,6 @@ def edit(target):
 @app.route("/move/<path:target>", methods=["POST"])
 @requires_auth
 def move(target):
-
     old_parent = os.path.dirname(target)
     new_target = os.path.join(old_parent, request.form.get("new_target"))
     try:
@@ -207,18 +209,64 @@ def move(target):
     except OSError as e:
         return jsonify({"msg": repr(e), "state": "fail"})
 
-    shortinfo = ""
-    new_short = request.form.get("new_short")
-    if not (new_short is None or new_short == "None"):
-        if filedb.get_meta_from_yaml(new_target).get("short", "") != new_short:
-            ret = filedb.update_meta_in_yaml(new_target, new_short)
-            shortinfo = f"[new short: '{new_short}' already taken!]" \
-                    if not ret else \
-                (f"[new short: '{new_short}']" if new_short != "" else \
-                 "[REMOVED SHORT]")
+    return jsonify({"msg": f"'{target}' moved to '{new_target}'", "state": "ok"})
 
-    return jsonify({"msg": f"'{target}' moved to '{new_target}' {shortinfo}",
-                    "state": "ok"})
+@app.route("/meta/<path:target>")
+@requires_auth
+def show_meta(target):
+    meta = filedb.get_meta_from_yaml(target)
+    return jsonify({"state": "ok", "meta": meta})
+
+@app.route("/meta/<path:target>/del/<key>", methods=["POST"])
+@requires_auth
+def del_meta_property(target, key):
+    meta = filedb.load_path_meta(target)
+    if key in meta:
+        del meta[key]
+        res = filedb.save_path_meta(target, meta)
+        # @fixme: handle error :(
+        return jsonify({"state": "ok", "msg": f"deleted meta key: {key}", "meta": meta})
+
+    return jsonify({"state": "fail", "msg": f"meta key not found: {key}"})
+
+@app.route("/meta/<path:target>/set/<key>/<value_type>/<value>", methods=["POST"])
+@requires_auth
+def set_meta_property(target, key, value_type, value=None):
+
+    if value_type in ["string", "path"]:
+        pass
+    elif value_type == "list":
+        value = value.split(",")
+    elif value_type == "dict":
+        value = dict(x.split(":") for x in value.split(","))
+    else:
+        return jsonify({"msg": f"internal error (meta set)", "state": "fail"})
+
+    meta = filedb.load_path_meta(target)
+    meta[key] = value
+
+    res = filedb.save_path_meta(target, meta)
+    dct = {"meta": meta}
+    if res:
+        dct.update({"state": "ok", "msg": f"meta-data updated for {target}"})
+    elif res is False:
+        dct.update({"state": "ok", "msg": f"no need to update meta-data for {target}"})
+    else:
+        dct.update({"state": "fail", "msg": f"failed updating meta-data for {target}"})
+
+    return jsonify(dct)
+
+@app.route("/meta/<path:target>/get/<key>", methods=["GET"])
+@requires_auth
+def get_meta_property(target, key):
+    meta = filedb.load_path_meta(target)
+    return jsonify({"state": "ok", "target": target, "meta": meta})
+
+
+#@app.route("/zones")
+#@app.route("/zones/<zone>/add")
+#@app.route("/zones/<zone>/edit")
+#@app.route("/zones/<zone>/del")
 
 @app.route("/del/<path:target>", methods=["POST"])
 @requires_auth
@@ -236,7 +284,7 @@ def delete(target):
 
 def file_get_helper(target, raw=False):
     try:
-        fn = filedb.get_path(target)
+        fn = filedb.safe_get_file_path(target)
         mime_info = mimetypes.guess_type(fn)
         if raw:
             out = None
@@ -245,32 +293,16 @@ def file_get_helper(target, raw=False):
             return out
         else:
             if STATIC_URL_PREFIX:
-                return Response(mimetype=mime_info[0], 
-                        headers={"X-Accel-Redirect": os.path.join(STATIC_URL_PREFIX, target)})
+                return Response(mimetype=mime_info[0],
+                        headers={"X-Accel-Redirect":
+                                 os.path.join(STATIC_URL_PREFIX, target)})
             else:
                 return send_file(fn, mimetype=mime_info[0], as_attachment=True)
 
     except FileDBError as e:
         msg = repr(e)
-        return render_page(os.path.dirnane(target), [msg])
+        return render_page(os.path.dirname(target), [msg])
 
-
-#@app.route("/s/<zone>/<s_id>", methods=["POST", "GET", "DELETE"])
-#@app.route("/s/<zone>", methods=["POST", "DELETE"])
-#@app.route("/s/x/<s_id>",   methods=["GET"])
-#@app.route("/s/x",          methods=["POST", "DELETE"])
-#@requires_zone_auth
-#def safe_shorties(zone, s_id=None):
-#    return shorties(zone, s_id)
-
-@app.route("/s/<s_id>", methods=["GET"])
-#@app.route("/s/",       methods=["POST", "DELETE"])
-def shorties(s_id):
-    rel_path = filedb.get_short_from_yaml(s_id)
-    if not rel_path:
-        #return jsonify({"msg": f"invalid request", "state": "fail"})
-        return redirect(url_for("custom_err", code=404))
-    return file_get_helper(rel_path)
 
 @app.route("/err/<int:code>", methods=["GET"])
 def custom_err(code):
@@ -281,45 +313,29 @@ def custom_err(code):
    return render_template("custom_err.html", err_code=code, err_desc=desc)
 
 
-#### @TODO: same here -> rework!!!!
-#@app.route("/pastebin", methods=["GET", "POST"])
-@app.route("/pastebin", methods=["GET"])
-def pastebin():
-    targetdir = "pastebin"
-    uid = str(create_uid())[:8]
-    while uid in filedb.get_contents(targetdir):
-        uid = str(create_uid())[:8]
-    targetpath = os.path.join(targetdir, uid)
-    return render_page(editor_target=targetpath, dirname=targetdir)
-
-############
-## just write / load database
-## add 404 for the errors, they shall not be forwarded on misses
-## yeah and what about the frontend ...
-
-
 @app.route("/get/download/<path:target>", methods=["GET"])
-@requires_auth
 def get_file(target):
-    return file_get_helper(target)
+    auth_wrap = no_auth if filedb.is_path_public(target) else requires_auth
+
+    def _get():
+        return file_get_helper(target)
+    return auth_wrap(_get)()
 
 @app.route("/get/raw/<path:target>", methods=["GET"])
-@requires_auth
 def get_raw_file(target):
-    try:
-        return jsonify(file_get_helper(target, raw=True))
-    except UnicodeDecodeError as e:
-        return jsonify({"state": "fail", "msgs":
-            ["Failed to load file as unicode...",
-             repr(e)[:50]] })
+    auth_wrap = no_auth if filedb.is_path_public(target) else requires_auth
+    def _get():
+        try:
+            return jsonify(file_get_helper(target, raw=True))
+        except UnicodeDecodeError as e:
+            return jsonify({"state": "fail", "msgs":
+                ["Failed to load file as unicode...",
+                 repr(e)[:50]] })
+    return auth_wrap(_get)()
 
 @app.route("/get/<path:target>", methods=["GET"])
 def get_file_short(target):
     return get_file(target)
-
-#@app.route("/get/<file_id>", methods=["GET"])
-#def get_pub_file(file_id):
-#  pass
 
 
 #@app.route('/photo/<id>')
