@@ -90,7 +90,15 @@ function show_preview(path) {
 	$("#previewbox img").attr("src", join_paths(url_prefix, "/get/download/", path));
 }
 
-function show_editor(path, readonly=false, newfile=false) {
+function show_editor(path, readonly=false, newfile=false, ignore_open=false) {
+
+	// only one editor open, avoid overwritting of unsaved data (the hard way):
+	if (!ignore_open && editor_target !== null) {
+		show_error("cannot open file for editing, editor already open");
+		show_message("close (& save) the current editor session first");
+		return;
+	}
+
 	if (path.indexOf("/") != 0)
 		path = "/" + path;
 
@@ -116,7 +124,7 @@ function show_editor(path, readonly=false, newfile=false) {
 					show_error(ret.msg);
 					show_message("assuming new file to be created...");
 					// if file loading failed: simply create one at 'path' (once saved)
-					show_editor(path, readonly=false, newfile=true);
+					show_editor(path, false, true, true);
 					return;
 				}
 				// data-contents (as raw-hidden-backup)
