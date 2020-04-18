@@ -4,10 +4,47 @@ Add bugs/todos here (change order for priority)
 
 
 - create new/empty file
- 
+
 - https://github.com/blueimp/jQuery-File-Upload
 
 - on "rename" enter/esc should do the right thing => ok / cancel
+
+- Communications:
+	-> generic json-received data handler
+	   -> parse for "state", react accordingly
+		 -> parse for "msg"
+		 -> any non-fail is the only function-callback to be provided here
+
+  -> generic ajax-sending (??) somehow not, but might be necessary due to
+	   json-receiver generalization ???
+
+	->
+
+
+- Database:
+	=> CRITICAL: MAIN FLAW: currently too many users on the same mmupload instance
+		 will likely break the yaml-db-file due to possible parallel reads/writes
+
+	-> YAML is somehow nice, but also sucks like hell, I see two ways from here:
+	   => keep it as simple as it is now and just change the following:
+		    - more convinience features despite load_config/save_config, especially
+					more granulation in loading & saving
+				- be multi-threading-safe by either
+					(1) "locking the .yaml" file, "with" access only on the db (slow but
+						  can be accelerated using a stack of files, if the main db-file is
+							locked too long, messy...)
+					(2) keep the db in mem (share data accross all/many wsgi/flask
+					    threads/procs(?)) + ensure thread-safety on mem-data, dump data
+							regulary and on events/trigger
+
+		 => go the bigger loop and search for an one-file-yaml-database abstraction
+		    library (does this exist?), features needed:
+				-> thread-safe db access
+				-> no extra daemon/process, must run within any thread as library
+				-> minimalistic querying capabilities (in fact dict()-api is enough)
+				-> ....
+
+
 
 
 DONE:
@@ -28,10 +65,10 @@ DONE:
 
 - control: => DONE
 	- keep edit + delete, but update icons
-	- preview: add new col and icon and preview 
-	- edit contents: add new col and icon 
+	- preview: add new col and icon and preview
+	- edit contents: add new col and icon
 
-- (mobile) pull to reload  -> https://github.com/BoxFactura/pulltorefresh.js 
+- (mobile) pull to reload  -> https://github.com/BoxFactura/pulltorefresh.js
 	=> DONE, just remove: body {overflow: hidden } CSS
 
 - make shortened url for any file => DONE (well yes) NOOOO!!!!
