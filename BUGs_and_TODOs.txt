@@ -71,13 +71,17 @@ Add bugs/todos here (change order for priority)
 	=> add something meaningful into the header row/cell (title??)
   => deactivate "edit" and "preview" for not-supported mimetypes
   => make table less jumpy after reload (hide first and then slide-in ???)
+  => editor theme, overall theme ?!
 
 - Editor:
 	=> make edit-cancel more user-friendly:
 	   => ask to save and open new file?
 		 => automatically save and open?
 		 => auto close, if not changed + ask for save if needed?
-
+	=> opening non-readable file shall be canceled instead of being handled as 
+	   "new" 
+  => read-only persists if it is set once and afterwards another file is opened
+	   for read-write ... (or only if "new" ???)
 
 
 
