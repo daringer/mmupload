@@ -3,7 +3,7 @@ body {
 	background-color: #bababc;
 	font-family: Monaco;
 	font-size: 0.9em;
-	overflow: hidden;
+	/*overflow: hidden;*/
 }
 
 input, input[type=submit], input[type=text], input[type=file],
