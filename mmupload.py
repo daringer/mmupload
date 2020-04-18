@@ -163,12 +163,14 @@ def custom_err(code):
 def create(dirname=""):
     state = "ok"
     try:
+        # creating new directory
         if request.form.get("what") == "create" and \
           len(request.form.get("new_dirname").strip()) > 0:
             new_dirname = request.form.get("new_dirname")
             filedb.create_dir(dirname, new_dirname)
             msg = f"directory created: {new_dirname}"
 
+        # uploading some file
         elif request.form.get("what") == "upload":
             app.config["UPLOADS_FILES_DEST"] = filedb.get_path(dirname)
             req_file = request.files.get("target")
