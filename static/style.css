@@ -88,6 +88,7 @@ label {
 	margin-left: 1.0em;
 	opacity: 0.35;
 	border-radius: 4px;
+	margin-bottom: -6px;
 }
 .icon:hover {
 	background-color: #ababab;
