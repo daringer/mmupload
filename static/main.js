@@ -91,7 +91,6 @@ function show_preview(path) {
 }
 
 function show_editor(path, readonly=false, newfile=false) {
-	//if (!path.indexOf("/") > -1)
 	if (path.indexOf("/") != 0)
 		path = "/" + path;
 
@@ -116,17 +115,23 @@ function show_editor(path, readonly=false, newfile=false) {
 				if (ret.state == "fail") {
 					show_error(ret.msg);
 					show_message("assuming new file to be created...");
+					// if file loading failed: simply create one at 'path' (once saved)
 					show_editor(path, readonly=false, newfile=true);
 					return;
 				}
-				$("#editorbox").slideDown("slow");
-				editor.focus();
+				// data-contents (as raw-hidden-backup)
 				$("form[name=editor] input[name=contents]").val(ret);
+
+				// slide editor-box in & set css accordingly
+				$("#editorbox").slideDown("slow");
 				$("#editorbox").css({display: "block", visibility: "visible"});
+
+				// editor props and contents set here
 				editor.$readOnly = readonly;
 				editor.setValue(ret.data);
 				editor.clearSelection();
 				editor.focus();
+
 				editor_target = path;
 				$("form[name=editor] label").attr("class", "unchanged");
 			}
