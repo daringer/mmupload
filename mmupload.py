@@ -17,6 +17,8 @@ from uuid import uuid4 as create_uid
 
 import yaml
 
+from mmpy.flask_simple_rest import FlaskSimpleRest, get_rest_decorator
+
 from file_db import FileDB, FileDBError
 from utils import load_config
 from gen_pass import make_pass
@@ -39,11 +41,14 @@ app.register_blueprint(main, url_prefix="/")
 
 filedb = FileDB(cfg["file_destination"], YAML_CFG_PATH)
 
+rest = get_rest_decorator(app)
+
 ####
 #### utils
 ####
 
 def render_page(dirname, msgs=None, editor_target=None, tmpl="tmpl.html"):
+    """returns: [view-ready-object] with primary page rendered with existing data"""
     parent = os.path.dirname(dirname)
     return render_template(tmpl,
         editor_target=editor_target,
@@ -55,10 +60,30 @@ def render_page(dirname, msgs=None, editor_target=None, tmpl="tmpl.html"):
         url_prefix=URL_PREFIX
     )
 
-def check_auth_global(username, password):
-    return username == cfg["user"] and cfg["pwd"] == make_pass(password)
+def _file_get_helper(target, raw=False):
+    """returns: [view-ready-object] handling file-get a.k.a. file downloading"""
+    try:
+        fn = filedb.safe_get_file_path(target)
+        mime_info = mimetypes.guess_type(fn)
+        if raw:
+            out = None
+            with open(fn, "r") as fd:
+                out = fd.read()
+            return jsonify({"data": out, "target": target, "action": "get_raw",
+                            "mimetype": mime_info[0]})
+        else:
+            if STATIC_URL_PREFIX:
+                return Response(mimetype=mime_info[0],
+                        headers={"X-Accel-Redirect":
+                                 os.path.join(STATIC_URL_PREFIX, target)})
+            else:
+                return send_file(fn, mimetype=mime_info[0], as_attachment=True)
 
-def check_auth_shared(share, username, password):
+    except FileDBError as e:
+        return jsonify({"state": "fail", "msg": repr(e), "target": target,
+                        "action": "get"})
+
+def check_auth_global(username, password):
     return username == cfg["user"] and cfg["pwd"] == make_pass(password)
 
 def http_authenticate():
@@ -75,7 +100,10 @@ def requires_auth(f):
             return http_authenticate()
         return f(*args, **kwargs)
     return decorated
-requires_zone_auth = requires_auth
+
+#def check_auth_shared(share, username, password):
+#    return username == cfg["user"] and cfg["pwd"] == make_pass(password)
+#requires_zone_auth = requires_auth
 
 # dummy decorator for non-authenticated access
 def no_auth(f):
@@ -85,7 +113,8 @@ def no_auth(f):
 #### endpoints
 ####
 
-@app.route("/local/<path:target>", methods=["GET"])
+#@rest.get("/local/<path:target>")
+@app.route("/local/<path:target>")
 #@requires_auth
 def get_static(target=""):
     if ".." in target:
@@ -98,7 +127,7 @@ def get_static(target=""):
     mime_info = mimetypes.guess_type(p)
     return Response(data, mimetype=mime_info[0])
 
-@app.route("/local/icon/<string:icon>", methods=["GET"])
+@app.route("/local/icon/<string:icon>")
 def get_icon(icon):
     if ".." in icon:
         return;
@@ -110,9 +139,26 @@ def get_icon(icon):
     mime_info = mimetypes.guess_type(p)
     return Response(data, mimetype=mime_info[0])
 
+@app.route("/")
+@app.route("/dir/")
+@app.route("/dir/<path:dirname>")
+@requires_auth
+def show(dirname=""):
+    #return render_page(dirname, msgs=[request.args.get("msg")])
+    #print (list(request.args), request.args.get("msg"))
+    return render_page(dirname, msgs=[request.args.get("msg")])
 
-@app.route("/new/", methods=["POST"])
-@app.route("/new/<path:dirname>", methods=["POST"])
+@app.route("/err/<int:code>")
+def custom_err(code):
+   desc = {
+     404: "Not Found",
+     403: "Not Allowed",
+   }.get(code, "")
+   return render_template("custom_err.html", err_code=code, err_desc=desc)
+
+
+@rest.post("/new/")
+@rest.post("/new/<path:dirname>")
 @requires_auth
 def create(dirname=""):
     state = "ok"
@@ -151,18 +197,8 @@ def create(dirname=""):
         state = "fail"
     return jsonify({"dirname": dirname, "msgs": [msg], "state": state})
 
-@app.route("/")
-@app.route("/dir/")
-@app.route("/dir/<path:dirname>")
-@requires_auth
-def show(dirname=""):
-    #return render_page(dirname, msgs=[request.args.get("msg")])
-    #print (list(request.args), request.args.get("msg"))
-    return render_page(dirname, msgs=[request.args.get("msg")])
-
-
-@app.route("/list/<string:what>/")
-@app.route("/list/<string:what>/<path:dirname>")
+@rest.get("/list/<string:what>/")
+@rest.get("/list/<string:what>/<path:dirname>")
 @requires_auth
 def ls(what, dirname=""):
     raw_list = map(lambda p: {
@@ -192,13 +228,12 @@ def ls(what, dirname=""):
     data = {"data": data, "upload_url": url_for("create", dirname=dirname)}
     return jsonify(data)
 
-
-@app.route("/edit/<path:target>", methods=["GET"])
+@rest.get("/edit/<path:target>")
 @requires_auth
 def edit(target):
     return render_page(dirname=os.path.dirname(target), editor_target=target)
 
-@app.route("/move/<path:target>", methods=["POST"])
+@rest.post("/move/<path:target>")
 @requires_auth
 def move(target):
     old_parent = os.path.dirname(target)
@@ -211,13 +246,13 @@ def move(target):
 
     return jsonify({"msg": f"'{target}' moved to '{new_target}'", "state": "ok"})
 
-@app.route("/meta/<path:target>")
+@rest.get("/meta/<path:target>")
 @requires_auth
 def show_meta(target):
     meta = filedb.get_meta_from_yaml(target)
     return jsonify({"state": "ok", "meta": meta})
 
-@app.route("/meta/<path:target>/del/<key>", methods=["POST"])
+@rest.post("/meta/<path:target>/del/<key>")
 @requires_auth
 def del_meta_property(target, key):
     meta = filedb.load_path_meta(target)
@@ -229,10 +264,9 @@ def del_meta_property(target, key):
 
     return jsonify({"state": "fail", "msg": f"meta key not found: {key}"})
 
-@app.route("/meta/<path:target>/set/<key>/<value_type>/<value>", methods=["POST"])
+@rest.post("/meta/<path:target>/set/<key>/<value_type>/<value>")
 @requires_auth
 def set_meta_property(target, key, value_type, value=None):
-
     if value_type in ["string", "path"]:
         pass
     elif value_type == "list":
@@ -256,7 +290,7 @@ def set_meta_property(target, key, value_type, value=None):
 
     return jsonify(dct)
 
-@app.route("/meta/<path:target>/get/<key>", methods=["GET"])
+@rest.get("/meta/<path:target>/get/<key>")
 @requires_auth
 def get_meta_property(target, key):
     meta = filedb.load_path_meta(target)
@@ -268,7 +302,7 @@ def get_meta_property(target, key):
 #@app.route("/zones/<zone>/edit")
 #@app.route("/zones/<zone>/del")
 
-@app.route("/del/<path:target>", methods=["POST"])
+@rest.post("/del/<path:target>")
 @requires_auth
 def delete(target):
     try:
@@ -282,58 +316,26 @@ def delete(target):
         return jsonify({"msg": repr(e), "state": "fail"})
     return jsonify({"msg": f"'{target}' deleted", "state": "ok"})
 
-def file_get_helper(target, raw=False):
-    try:
-        fn = filedb.safe_get_file_path(target)
-        mime_info = mimetypes.guess_type(fn)
-        if raw:
-            out = None
-            with open(fn, "r") as fd:
-                out = fd.read()
-            return out
-        else:
-            if STATIC_URL_PREFIX:
-                return Response(mimetype=mime_info[0],
-                        headers={"X-Accel-Redirect":
-                                 os.path.join(STATIC_URL_PREFIX, target)})
-            else:
-                return send_file(fn, mimetype=mime_info[0], as_attachment=True)
-
-    except FileDBError as e:
-        msg = repr(e)
-        return render_page(os.path.dirname(target), [msg])
-
-
-@app.route("/err/<int:code>", methods=["GET"])
-def custom_err(code):
-   desc = {
-     404: "Not Found",
-     403: "Not Allowed",
-   }.get(code, "")
-   return render_template("custom_err.html", err_code=code, err_desc=desc)
-
-
-@app.route("/get/download/<path:target>", methods=["GET"])
+@rest.get("/get/download/<path:target>")
 def get_file(target):
     auth_wrap = no_auth if filedb.is_path_public(target) else requires_auth
-
     def _get():
-        return file_get_helper(target)
+        return _file_get_helper(target)
     return auth_wrap(_get)()
 
-@app.route("/get/raw/<path:target>", methods=["GET"])
+@rest.get("/get/raw/<path:target>")
 def get_raw_file(target):
     auth_wrap = no_auth if filedb.is_path_public(target) else requires_auth
     def _get():
         try:
-            return jsonify(file_get_helper(target, raw=True))
+            return _file_get_helper(target, raw=True)
         except UnicodeDecodeError as e:
             return jsonify({"state": "fail", "msgs":
                 ["Failed to load file as unicode...",
                  repr(e)[:50]] })
     return auth_wrap(_get)()
 
-@app.route("/get/<path:target>", methods=["GET"])
+@rest.get("/get/<path:target>")
 def get_file_short(target):
     return get_file(target)
 

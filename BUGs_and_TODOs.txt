@@ -44,7 +44,9 @@ Add bugs/todos here (change order for priority)
 				-> minimalistic querying capabilities (in fact dict()-api is enough)
 				-> ....
 
-
+- Messages
+	=> we need a consistent message scheme and less cryptic ones would also be
+		 nice!
 
 
 DONE:

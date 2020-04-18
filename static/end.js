@@ -227,8 +227,10 @@ $(function() {
 		});
 	});
 
+	// this global variable `editor_target` can be set to directly open a file
+	// within the editor, once the document has been loaded
 	if (editor_target != null) {
-		show_editor(editor_target, false, true);
+		show_editor(editor_target, false, false);
 	}
 
 	/************************************************/

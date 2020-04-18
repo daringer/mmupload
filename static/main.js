@@ -91,7 +91,8 @@ function show_preview(path) {
 }
 
 function show_editor(path, readonly=false, newfile=false) {
-	if (!path.indexOf("/") > -1)
+	//if (!path.indexOf("/") > -1)
+	if (path.indexOf("/") != 0)
 		path = "/" + path;
 
 	//$("#editorbox").css("visibility", "visible").show();
@@ -113,7 +114,9 @@ function show_editor(path, readonly=false, newfile=false) {
 			},
 			success: function(ret) {
 				if (ret.state == "fail") {
-					ret.msgs.forEach(msg => show_error(msg));
+					show_error(ret.msg);
+					show_message("assuming new file to be created...");
+					show_editor(path, readonly=false, newfile=true);
 					return;
 				}
 				$("#editorbox").slideDown("slow");
@@ -121,7 +124,7 @@ function show_editor(path, readonly=false, newfile=false) {
 				$("form[name=editor] input[name=contents]").val(ret);
 				$("#editorbox").css({display: "block", visibility: "visible"});
 				editor.$readOnly = readonly;
-				editor.setValue(ret);
+				editor.setValue(ret.data);
 				editor.clearSelection();
 				editor.focus();
 				editor_target = path;
@@ -135,11 +138,11 @@ function toggle_public(item) {
 
 		let new_is_public = (item.zones.indexOf("pub") == -1);
 
-		let my_url = (!new_is_public) ? 
-			url_prefix + `/meta/${item.path}/del/zones` : 
+		let my_url = (!new_is_public) ?
+			url_prefix + `/meta/${item.path}/del/zones` :
 			url_prefix + `/meta/${item.path}/set/zones/list/pub`;
-	
-		$.ajax({ 
+
+		$.ajax({
 			type: "POST",
 			url: my_url,
 			error: function() {
@@ -149,15 +152,15 @@ function toggle_public(item) {
 				if (ret.state == "ok") {
 					show_message(ret.msg);
 
-					/* OVERALL TODO: we should have the possibility to update a 
-					 * single ITEM from the backend 
-					 * (and update the frontend) 
+					/* OVERALL TODO: we should have the possibility to update a
+					 * single ITEM from the backend
+					 * (and update the frontend)
 		 			 */
 
 					item.zones = ret.meta.zones || new Array();
 					set_icon_public(item);
 
-				} else  
+				} else
 					show_error(ret.msg);
 			}
 		});
@@ -251,7 +254,7 @@ function ctrl_action(uid, op) {
 		x.last_mode = x.active_mode;
 		x.active_mode = null;
 		show_ctrls(x.uid, primary_modes, ask_modes);
-	} else { 
+	} else {
 		x.last_mode = null;
 		x.active_mode = op;
 		if (["delete", "rename", null].indexOf(op) > -1)
