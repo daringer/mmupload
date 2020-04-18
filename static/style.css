@@ -241,16 +241,14 @@ article {
 }
 
 #flash  .err {
-	background-color: #db02b5bb;
+	background-color: #ed5f5f80;
 	border-radius: 0.25em;
 }
 
 #flash .info {
-	background-color: #2f5431bb;
+	background-color: #38805d6e;
 	border-radius: 0.25em;
 }
-
-
 
 #flash div {
 	font-weight: bold;
