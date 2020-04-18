@@ -1,9 +1,5 @@
 """
-Management of the actual files on the filesystem level.
-
-- By providing `root_dir` during construction the resulting instance will try
-  to make sure non (intentionally) invalid path is being processed and/or
-  handled in any ways.
+Management of mmupload-handled files on the filesystem level.
 
 """
 
@@ -157,6 +153,7 @@ class FileDB:
         os.rename(self.get_path(old_path), self.get_path(new_path))
 
     def create_dir(self, dirname, new_dir):
+        """returns: ret-code of os.makedirs -> OS-lvl feedback"""
         if not self.name_pat.match(new_dir):
             raise InvalidName(f"{new_dir} (need: {self.raw_name_pat})")
         if new_dir in self.get_contents(dirname):
@@ -164,6 +161,7 @@ class FileDB:
         return os.makedirs(self.get_path(os.path.join(dirname, new_dir)))
 
     def update_file(self, dirname, filename, contents):
+        """returns: `path`, updated with `contents` => direct py (path must exist)"""
         target = os.path.join(dirname, filename)
         path = self.get_path(target)
         if not self.isfile(path):
@@ -174,7 +172,8 @@ class FileDB:
 
         return path
 
-    def create_raw_file(self, dirname, filename, raw_data):
+    def create_raw_file(self, dirname:str , filename:str , raw_data: str):
+        """returns: `path`, `raw_data` written to => direct py (new path)"""
         target = os.path.join(dirname, filename)
         if target in self.get_contents(dirname):
             raise FileAlreadyExists(target)
@@ -187,7 +186,8 @@ class FileDB:
             fd.write(raw_data)
         return path
 
-    def create_file(self, dirname, data):
+    def create_file(self, dirname: str, data: str):
+        """returns: `path`, `data` written to => flask's file-mgmt (new path)"""
         target = os.path.join(dirname, data.filename)
         if target in self.get_contents(dirname):
             raise FileAlreadyExists(target)
@@ -200,11 +200,13 @@ class FileDB:
         return path
 
     def delete_file(self, path):
+        """returns: OS-lvl ret-code from `os.unlink()`"""
         if not self.isfile(path):
             raise FileNotExisting(path)
         return os.unlink(self.get_path(path))
 
     def delete_dir(self, dirname):
+        """returns: OS-lvl ret-code from `os.rmdir()`"""
         if not self.isdir(dirname):
             raise DirNotExisting(dirname)
         if len(self.get_contents(dirname)) > 0:
@@ -214,6 +216,7 @@ class FileDB:
         return os.rmdir(self.get_path(dirname))
 
     def get_file(self, rel_path, as_iter=False):
+        """returns: either plain full file contents or a generator for each line"""
         path = self.get_path(rel_path)
         if not self.isfile(rel_path):
             raise NotAFileError(path)
