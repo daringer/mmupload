@@ -3,13 +3,39 @@ import sys
 import yaml
 from datetime import datetime as dt
 from datetime import timedelta as td
+from time import sleep
+
+import fcntl
+
+
+class PathLocker:
+    def __init__(self, path_to_lock):
+        self.path_to_lock = path_to_lock
+        self.fp = None
+
+    def __enter__ (self):
+        if not os.path.exists(self.path_to_lock):
+            self.fp = open(self.path_to_lock, "rb")
+            fcntl.flock(self.fp.fileno(), fcntl.LOCK_EX)
+
+    def __exit__ (self, _type, value, tb):
+        if self.fp:
+            fcntl.flock(self.fp.fileno(), fcntl.LOCK_UN)
+            self.fp.close()
+
 
 def load_config(config_path):
-    """load config in given 'config_path', on any error fail critical & exit!"""
+    """load config in given 'fconfig_path', on any error fail critical & exit!"""
+
+    print("load config")
+
     if not os.path.exists(config_path):
         print("config path: {config_path} not found, exiting...")
         sys.exit(1)
-    cfg = yaml.safe_load(open(config_path, "r"))
+
+
+    with PathLocker(config_path):
+        cfg = yaml.safe_load(open(config_path, "r"))
 
     if not cfg:
         print(f"cannot load config ({config_path}), exiting...")
@@ -50,17 +76,24 @@ def load_config(config_path):
             invalidate.append(token)
     for token in invalidate:
         del cfg["upload_tokens"][token]
-    save_config(cfg, config_path)
-    #cfg = load_config(config_path)
+
+    if len(invalidate) > 0:
+        with PathLocker():
+            save_config(cfg, config_path)
 
     return cfg
 
 def save_config(cfg, config_path):
+
+    print ("save config")
+
     cfg.setdefault("upload_tokens", {})
     cfg.setdefault("zones", {"pub": {}})
     cfg.setdefault("paths", {})
-    with open(config_path, "w") as fd:
-        yaml.safe_dump(cfg, fd)
+
+    with PathLocker():
+        with open(config_path, "w") as fd:
+            yaml.safe_dump(cfg, fd)
 
 
 

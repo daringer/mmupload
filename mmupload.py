@@ -119,7 +119,6 @@ def http_logout():
     return http_authenticate()
 
 
-#@rest.get("/local/<path:target>")
 @app.route("/local/<path:target>")
 #@requires_auth
 def get_static(target=""):
@@ -133,17 +132,22 @@ def get_static(target=""):
     mime_info = mimetypes.guess_type(p)
     return Response(data, mimetype=mime_info[0])
 
+ICON_CACHE = {}
+
 @app.route("/local/icon/<string:icon>")
 def get_icon(icon):
     if ".." in icon:
         return;
 
-    p = os.path.join("static", "icons", "svg", icon + ".svg")
-    data = None
-    with open(p, "r") as fd:
-        data = fd.read()
-    mime_info = mimetypes.guess_type(p)
-    return Response(data, mimetype=mime_info[0])
+    data, mtype = ICON_CACHE.get(icon, (None, None))
+    if not data:
+        p = os.path.join("static", "icons", "svg", icon + ".svg")
+        with open(p, "r") as fd:
+            data = fd.read()
+        mtype = mimetypes.guess_type(p)[0]
+        ICON_CACHE[icon] = (data, mtype)
+
+    return Response(data, mimetype=mtype)
 
 @app.route("/")
 @app.route("/dir/")
