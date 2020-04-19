@@ -317,9 +317,9 @@ def new_upload_token(dirname):
         "created": dt.now()
     }
     save_config(cfg, YAML_CFG_PATH)
-    return jsonify({"state": "ok", "msg": "token created successfully",
-                    "link": os.path.join(URL_PREFIX, url_for("use_token", token=token)),
-                    "token": token })
+    link_path = os.path.join(URL_PREFIX, url_for("use_token", token=token))
+    return jsonify({"state": "ok", "msg": f"token ({token}) created successfully",
+                    "link": link_path, "token": token })
 
 @rest.get("/token/upload/")
 @requires_auth
@@ -346,7 +346,6 @@ def token_create(token):
     cfg = load_config(YAML_CFG_PATH)
     if token in cfg["upload_tokens"]:
         target_dir = cfg["upload_tokens"][token]["target"]
-        # uploading some file
         app.config["UPLOADS_FILES_DEST"] = filedb.get_path(target_dir)
         req_file = request.files.get("target")
         filename = filedb.create_file(target_dir, req_file)

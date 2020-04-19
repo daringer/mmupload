@@ -43,11 +43,15 @@ def load_config(config_path):
 
     # finally check and remove expired tokens
     invalidate = []
+    expire_in = td(weeks=1)
+    #expire_in = td(seconds=1)
     for token, props in cfg.setdefault("upload_tokens", {}).items():
-        if dt.now() - props["created"] > td(weeks=1):
+        if dt.now() - props["created"] > expire_in:
             invalidate.append(token)
     for token in invalidate:
         del cfg["upload_tokens"][token]
+    save_config(cfg, config_path)
+    #cfg = load_config(config_path)
 
     return cfg
 

@@ -43,8 +43,11 @@ function join_paths(...paths) {
 	return out;
 }
 
+function show_error(msg) {
+	show_message(msg, 1000, 15000, true);
+}
 
-function show_message(msg, error=false) {
+function show_message(msg, fade_in=1000, fade_out=15000, error=false) {
 	if (msg == "None")
 		return;
 
@@ -56,7 +59,7 @@ function show_message(msg, error=false) {
 		left: "-2px",
 		top: "7px"
 	});
-	$(el).text(msg).attr("class", (error) ? "err" : "info").hide();
+	$(el).html(msg).attr("class", (error) ? "err" : "info").hide();
 	$(el).prepend(ic);
 	$("#flash").prepend(el);
 	$(el).fadeIn(1000, function() {
@@ -64,10 +67,6 @@ function show_message(msg, error=false) {
 			$(el).remove();
 		});
 	});
-}
-
-function show_error(msg) {
-	show_message(msg, true);
 }
 
 function readable_size(size) {
@@ -187,7 +186,6 @@ function set_icon_public(item) {
 				$("#iconbox_" + item.uid + "_public img")
 					.css("background-color", "#33cc33");
 }
-
 
 function update_active_directory(target) {
 	$("#curpath").empty();
@@ -324,7 +322,7 @@ function ctrl_action(uid, op) {
 			success: function(ret) {
 				if (ret.state == "ok") {
 					show_message(ret.msg);
-					show_message(ret.link);
+					show_message(`<a href=${ret.link}>token upload link - click me!</a>`, 1000, 60000);
 				} else
 					show_error(ret.msg);
 			}

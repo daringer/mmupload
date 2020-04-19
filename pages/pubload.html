@@ -51,6 +51,8 @@
 	var editor_target = null;
 	{% endif %}
 */
+
+
 </script>
 
 <body>
@@ -59,48 +61,8 @@
 <article>
 	<div id=flash class=toplvlbox></div>
 </article>
-<!--div id="previewbox"><img></img></div>
 
 <article>
-	<div id=curpath class=toplvlbox></div>
-</article>
-
-<main>
-
-	<article>
-		<div id=editorbox style="visibility: hidden; display: none;">
-			<div id=editor_ctrl class=sublvlbox>
-				<form method=POST name=editor
-						  action="{{ url_for('create', dirname=base_dir) }}">
-					<input type=image src="{{ url_for('get_icon', icon='content-save') }}" name=what value=save />
-					<input type=image src="{{ url_for('get_icon', icon='window-close') }}" name=close value=close />
-					<label class=unchanged></label>
-					<input type=hidden name=filename />
-		  		<input type=hidden name=data />
-				</form>
-			</div>
-	  	<div id=editor></div>
-		</div>
-		<div id=previewbox style="visibility: hidden; display: none;">
-			<img src="" />
-		</div>
-	</article>
-
-	<article>
-		<div id=dirs class=toplvlbox></div>
-		<div id=files class=toplvlbox></div>
-	</article-->
-
-	<article>
-			<!--div id=newdir class=toplvlbox>
-			  <form method=POST action="{{ url_for("create", dirname=base_dir) }}"
-			  			name=newdir>
-				  <label>new directory:</label>
-				  <input type=text name=new_dirname value=""/>
-				  <input type=submit value=create name=what />
-			  </form>
-		  </div-->
-
  		  <div id=upload class=toplvlbox>
  			  <form method=POST enctype=multipart/form-data
   						action="{{ action }}" name=upload>
@@ -111,7 +73,7 @@
 			  </form>
 		  </div>
 
-	</article>
+</article>
 
 
 </main>

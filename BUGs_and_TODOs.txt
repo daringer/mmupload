@@ -16,6 +16,15 @@ Add bugs/todos here (change order for priority)
 	   => best case any action does not care about the icons, but only sets
 		    internal item state and the icons react accordingly
 
+- Tokens:
+	=> move show_error() and show_message() into seperate js to use it within
+	   pubload
+  => use ajax call instead of form "submit" to upload file
+	=> show 'ret.msg' after upload
+	=> if token is created, find some place to keep it on the screen longer
+		 => show_long_message()  ???
+  => overall: find some navigation spot, need now link to logout + show tokens
+	=> 
 
 - Mobile:
 	=> increase icon size
