@@ -9,7 +9,12 @@ def load_config(config_path):
     if not os.path.exists(config_path):
         print("config path: {config_path} not found, exiting...")
         sys.exit(1)
-    cfg = yaml.safe_load(open(config_path))
+    cfg = yaml.safe_load(open(config_path, "rb"))
+
+    if not cfg:
+        print(f"cannot load config ({config_path}), exiting...")
+        sys.exit(1)
+
 
     # fatal: no "file_destination" set ...
     if "file_destination" not in cfg:
