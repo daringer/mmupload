@@ -1,9 +1,42 @@
 
+:root {
+	--bg-color:       #C4C4C5;
+	--bg-color-alt:   #BABABA;
+
+	--fg-color:       #454552;
+	--fg-color-hover: #353542;
+
+	--border-color:     #7A7A7A;
+	--border-color-alt: #BABABA;
+  --border-color-row: #9A9A9A;
+	--border-color-icon:   #7A7A7A;
+
+	--extra-color:    #F8F8F8;
+
+	--bg-icon:       #A04010;
+	--bg-icon-alt:   #469600;
+	--bg-icon-hover: #ABABAB;
+	--bg-icon-good:  #469600;
+	--bg-icon-bad:   #A04010;
+
+	--bg-msg-info:   #38805d6e;
+	--bg-msg-err:    #ed5f5f80;
+
+}
+
+/*:root {
+	--bg-color: #282828;
+	--fg-color: #0C0032;
+	--border-color: #190061;
+	--bg-color-odd: #240090;
+	--bg-color-even: #3500D3;
+}*/
+
+
 body {
-	background-color: #bababc;
+	background-color: var(--bg-color);
 	font-family: Monaco;
 	font-size: 0.9em;
-	/*overflow: hidden;*/
 }
 
 input, input[type=submit], input[type=text], input[type=file],
@@ -11,9 +44,9 @@ input[type=submit], input[type=number], input[type=button],
 #editorbox input[type=button], #editorbox input[type=submit] {
 	font-size: 1em;
 	font-family: Monaco;
-	color: #454552;
+	color: var(--fg-color);
 	border: 0;
-	background-color: #c4c4c5;
+	background-color: var(--bg-color-alt);
 	box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);
 }
 
@@ -40,13 +73,14 @@ form label {
 label {
 	font-weight: bold;
 	text-align: left;
+	margin-left: 6px;
 }
 
 .changed {
-	color: #bf4444;
+	color: var(--bg-msg-info);
 }
 .unchanged {
-	color: #dedede;
+	color: var(--bg-msg-err);
 }
 
 
@@ -62,8 +96,8 @@ label {
 .iconbox .tooltip {
 	visibility: hidden;
 	width: 10em;
-	border: 1px solid #7a7a7a;
-	background-color: #c4c4c5;
+	border: 1px solid var(--border-icon);
+	background-color: var(--bg-color-alt);
 	color: #000;
 	text-align: center;
 	border-radius: 3px;
@@ -91,24 +125,24 @@ label {
 	margin-bottom: -6px;
 }
 .icon:hover {
-	background-color: #ababab;
+	background-color: var(--bg-icon-hover);
 	opacity: 1.0;
 }
 
 .icon_confirm {
 	margin-right:20px;
-	background-color: #469600;
+	background-color: var(--bg-icon-good);
 }
 .icon_confirm:hover {
 	margin-right:20px;
-	background-color: #469600;
+	background-color: var(--bg-icon-good);
 	opacity: 0.7;
 }
 .icon_cancel {
-	background-color: #a04010;
+	background-color: var(--bg-icon-bad);
 }
 .icon_cancel:hover {
-	background-color: #a04010;
+	background-color: var(--bg-icon-bad);
 	opacity: 0.7;
 }
 
@@ -122,7 +156,7 @@ a.uniquelink {
 #editor_ctrl {
 	border: 0;
 	background-color: black;
-	color: #dedede;
+	color: var(--bg-color-alt);
 	margin-left: 0;
 	padding-left: 3em;
 	padding-top: 1em;
@@ -143,9 +177,8 @@ a.uniquelink {
 	width:10000em;
 }
 
-
 #editorbox {
-	background-color: #cccccc;
+	background-color: var(--bg-color-alt);
 	line-height: 2.4em;
 	padding: 6px;
 }
@@ -161,8 +194,8 @@ a.uniquelink {
 	border: 0;
 }
 .toplvlbox {
-	background-color: #cccccc;
-	box-shadow:  1px 2px 2px rgba(0, 0, 0, .15);
+	background-color: var(--bg-color);
+	box-shadow: -2px 2px 6px rgba(0, 0, 0, .15);
 	line-height: 2.4em;
 	padding: 6px;
 	height: 2.4em;
@@ -177,25 +210,14 @@ article {
 	margin-top: 8px;
 }
 
-@media only screen and (max-width: 1279px) {
-	#files, #dirs, #curpath, #editorbox, #newdir, #upload {
-		width: 100%;
-		border-top: solid 0.33em #bababc;
-	}
-	#flash {
-		width: 100%;
-		background-color: #cccccc;
-		line-height: 2.4em;
-		padding: 6px;
-	}
-}
+
 /*** screens < 1280px (smartphones) */
 @media only screen and (min-width: 1280px) {
 	#dirs, #newdir {
 		display: table-cell;
 		min-width: 450px;
 		margin-top: 10px;
-		border-right: solid 0.33em #bababc;
+		border-right: solid 0.33em var(--bg-color);
 	}
 	#files, #upload {
 		display: table-cell;
@@ -206,7 +228,7 @@ article {
 		height: 30vh !important;
 	}
 	#flash {
-		background-color: #cccccc;
+		background-color: var(--bg-color);;
 		line-height: 2.4em;
 		padding: 6px;
 	}
@@ -242,25 +264,33 @@ article {
 }
 
 #flash  .err {
-	background-color: #ed5f5f80;
+	background-color: var(--bg-msg-err);
 	border-radius: 0.25em;
 }
 
 #flash .info {
-	background-color: #38805d6e;
+	background-color: var(--bg-msg-info);
 	border-radius: 0.25em;
 }
 
 #flash div {
 	font-weight: bold;
-	background-color: #9a5f66;
+	/*background-color: var(--bg-mgs-info);*/
 	display: inline-block;
 	padding-left: 8px;
 	padding-right: 10px;
-	color: #f8f8f8;
+	color: var(--fg-color);
 	margin-right: 10px;
 	margin-bottom: 8px;
-	/*box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);*/
+	box-shadow:  1px 1px 1px rgba(0, 0, 0, .15);*/
+}
+
+.jsgrid-filter-row>.jsgrid-cell:first-child,
+.jsgrid-header-row>.jsgrid-header-cell:first-child,
+.jsgrid-insert-row>.jsgrid-cell:first-child,
+.jsgrid-alt-row>.jsgrid-cell,
+.jsgrid-header-row>.jsgrid-header-cell {
+	background-color: var(--bg-color);
 }
 
 .jsgrid-edit-row input, .jsgrid-edit-row select, .jsgrid-edit-row textarea {
@@ -279,24 +309,25 @@ article {
 	line-height: 1.6em;
 }
 
-.jsgrid-cell, .jsgrid-row>.jsgrid-cell, .jsgrid-alt-row>.jsgrid-cell, .jsgrid-edit-row,
-.jsgrid-header-row>.jsgrid-header-cell, .jsgrid-nodata-row>.jsgrid-cell, .jsgrid-edit-row>.jsgrid-cell {
-	background-color: unset;
+.jsgrid-cell, .jsgrid-row>.jsgrid-cell, .jsgrid-alt-row>.jsgrid-cell,
+.jsgrid-edit-row, .jsgrid-header-row>.jsgrid-header-cell,
+.jsgrid-nodata-row>.jsgrid-cell, .jsgrid-edit-row>.jsgrid-cell {
+	background-color: var(--bg-color);
 	overflow: hidden;
 	border: 0;
-	border-top: 1px dotted #bebebe;
+	border-top: 1px solid var(--border-color-row);
 	margin: 2px;
 }
 
 .jsgrid-row:hover, .jsgrid-alt-row:hover {
-	background-color: #bfbfbf;
+	background-color: var(--bg-color);
 }
 
 .jsgrid-header-row>.jsgrid-header-cell {
 	border: 0;
-	border-bottom: 2px solid #7a7a7a;
+	border-bottom: 2px solid var(--border-color-row);
 	text-align: left;
-	background-color: unset;
+	background-color: var(--bg-color);
 }
 
 #files a.name, #dirs a.name {
@@ -326,18 +357,78 @@ article {
 }
 
 a:active, a:link, a:visited {
-	color: #454552;
+	color: var(--fg-color);
 	text-decoration: none;
 }
 
 a:hover {
-	color: #353542;
+	color: var(--fg-color-hover);
 	text-decoration: underline;
 }
 
 br {
 	clear: both;
 }
+
+
+
+
+
+
+@media only screen and (max-width: 1279px) {
+	#files, #dirs, #curpath, #editorbox, #newdir, #upload {
+		width: 100%;
+		border-top: solid 0px var(--border-color);
+	}
+	#flash {
+		width: 100%;
+		background-color: var(--bg-color);
+		line-height: 2.4em;
+		padding: 6px;
+	}
+	.jsgrid-row, .jsgrid-alt-row, .jsgrid-header-row, .jsgrid-filter-row,
+	.jsgrid-insert-row, .jsgrid-grid-body, .jsgrid-header-scrollbar,
+	.jsgrid-nodata-row {
+			line-height: 1.6em;
+	}
+	.jsgrid {
+			font-size: 1.25em;
+	}
+
+	#dirs {
+		margin-bottom: 6px;
+	}
+	th {
+		font-size: 0.9em;
+		line-height: 0.9em;
+	}
+	.jsgrid-cell {
+    	padding: .25em;
+			padding-top: 1.5em;
+			padding-bottom: 1.5em;
+	}
+	body {
+		font-size: 1.0em;
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

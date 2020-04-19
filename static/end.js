@@ -66,10 +66,10 @@ var dir_grid = $("#dirs").jsGrid({
 		{ name: "move_url", type: "text", visible: false},
 		{ name: "delete_url", type: "text", visible: false},
 		{ name: "click_url", type: "text", visible: false},
-		{ name: "size", title: "Tree Size", type: "text", align: "left",
+		{ name: "size", title: "Tree Size", type: "text", align: "right",
 			readOnly: true, editing: false, visible: false},
 		{ name: "ctrl", title: "", type: "myctrl", grid_id: "dirs", width: 80,
-			readOnly: true}
+			readOnly: true, align: "right"}
 	],
 
 	rowClick: function(args) {},
@@ -136,9 +136,10 @@ var file_grid = $("#files").jsGrid({
 		{ name: "delete_url", type: "text", visible: false},
 		{ name: "click_url", type: "text", visible: false},
 		//{ name: "
-		{ name: "size", title: "Size", type: "text", align: "left", width: 150,
+		{ name: "size", title: "Size", type: "text", align: "right", width: 150,
 			readOnly: true, editing: false},
-		{ name: "ctrl", title: "", type: "myctrl", grid_id: "files", width: 160}
+		{ name: "ctrl", title: "", type: "myctrl", align: "right",
+			grid_id: "files", width: 160}
 	],
 
 	rowClick: function(args) {},
