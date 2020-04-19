@@ -76,7 +76,7 @@ def load_config(config_path):
         del cfg["upload_tokens"][token]
 
     if len(invalidate) > 0:
-        with PathLocker():
+        with PathLocker(config_path):
             save_config(cfg, config_path)
 
     return cfg
@@ -88,7 +88,7 @@ def save_config(cfg, config_path):
     cfg.setdefault("zones", {"pub": {}})
     cfg.setdefault("paths", {})
 
-    with PathLocker():
+    with PathLocker(config_path):
         with open(config_path, "w") as fd:
             yaml.safe_dump(cfg, fd)
 
