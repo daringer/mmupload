@@ -113,6 +113,11 @@ def no_auth(f):
 #### endpoints
 ####
 
+@app.route("/logout")
+def http_logout():
+    return http_authenticate()
+
+
 #@rest.get("/local/<path:target>")
 @app.route("/local/<path:target>")
 #@requires_auth
