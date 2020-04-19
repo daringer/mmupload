@@ -1,6 +1,8 @@
 import os
 import sys
 import yaml
+from datetime import datetime as dt
+from datetime import timedelta as td
 
 def load_config(config_path):
     """load config in given 'config_path', on any error fail critical & exit!"""
@@ -34,9 +36,20 @@ def load_config(config_path):
     # ensure public zone in config
     cfg.setdefault("zones", {})["pub"] = {}
 
+    # finally check and remove expired tokens
+    invalidate = []
+    for token, props in cfg["upload_tokens"].items():
+        if dt.now() - props["created"] > td(weeks=1):
+            invalidate.append(token)
+    for token in invalidate:
+        del cfg["upload_tokens"][token]
+
     return cfg
 
 def save_config(cfg, config_path):
+    cfg.setdefault("upload_tokens", {})
+    cfg.setdefault("zones", {"pub": {}})
+    cfg.setdefault("paths", {})
     with open(config_path, "w") as fd:
         yaml.safe_dump(cfg, fd)
 

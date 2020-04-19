@@ -235,7 +235,7 @@ function update_active_directory(target) {
 
 function show_mode(mymode) {
 	// set icon-visibility mode for all items
-	let p_modes = ["edit", "rename", "delete", "preview", "public"];
+	let p_modes = ["edit", "rename", "delete", "preview", "public", "upload_token"];
 	let a_modes = ["confirm", "cancel"];
 	if (a_modes.indexOf(mymode) > -1)
 		Object.keys(uid2item).forEach((uid) => show_ctrls(uid, a_modes, p_modes));
@@ -252,7 +252,7 @@ function show_ctrls(uid, show_ops, hide_ops) {
 }
 
 function ctrl_action(uid, op) {
-	let primary_modes = ["rename", "delete", "edit", "preview", "public"];
+	let primary_modes = ["rename", "delete", "edit", "preview", "public", "upload_token"];
 	let ask_modes = ["confirm", "cancel"];
 	let all_modes = primary_modes.concat(ask_modes);
 
@@ -309,6 +309,26 @@ function ctrl_action(uid, op) {
 			show_ctrls(uid, primary_modes, ask_modes);
 		}	else
 			show_error(`mimetype: ${x.mimetype} not yet preview-able...`);
+	}
+
+	if (x.active_mode == "upload_token") {
+
+		let my_url = `${url_prefix}/token/upload/${x.path}`;
+
+		$.ajax({
+			type: "POST",
+			url: my_url,
+			error: function() {
+				show_error(`error creating token for: ${x.path}`);
+			},
+			success: function(ret) {
+				if (ret.state == "ok") {
+					show_message(ret.msg);
+					show_message(ret.link);
+				} else
+					show_error(ret.msg);
+			}
+		});
 	}
 
 	if (x.active_mode == "public") {

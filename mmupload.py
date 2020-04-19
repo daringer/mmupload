@@ -2,6 +2,7 @@ import sys
 import os
 from functools import wraps
 
+from datetime import datetime as dt
 import hashlib
 import mimetypes
 
@@ -20,7 +21,7 @@ import yaml
 from mmpy.flask_simple_rest import FlaskSimpleRest, get_rest_decorator
 
 from file_db import FileDB, FileDBError
-from utils import load_config
+from utils import load_config, save_config
 from gen_pass import make_pass
 
 # where to find the .yaml config file
@@ -303,6 +304,56 @@ def get_meta_property(target, key):
     meta = filedb.load_path_meta(target)
     return jsonify({"state": "ok", "target": target, "meta": meta})
 
+@rest.post("/token/upload/<path:dirname>")
+@requires_auth
+def new_upload_token(dirname):
+    hf = hashlib.sha3_224
+    uuid = create_uid()
+    token = hf(uuid.bytes).hexdigest()
+
+    cfg.setdefault("upload_tokens", {})[token] = {
+        "target": dirname,
+        "created": dt.now()
+    }
+    save_config(cfg, YAML_CFG_PATH)
+    return jsonify({"state": "ok", "msg": "token created successfully",
+                    "link": os.path.join(URL_PREFIX, url_for("use_token", token=token)),
+                    "token": token })
+
+@rest.get("/token/upload/")
+@requires_auth
+def list_tokens():
+    cfg = load_config(YAML_CFG_PATH)
+    return jsonify({
+        "state": "ok",
+        "msg": "loaded and providing upload tokens",
+        "upload_tokens": cfg["upload_tokens"]
+    })
+
+@rest.get("/pubload/<token>")
+def use_token(token):
+    cfg = load_config(YAML_CFG_PATH)
+    if token in cfg["upload_tokens"]:
+        target_dir = cfg["upload_tokens"][token]["target"]
+        return render_template("pubload.html",
+                               action=url_for("token_create", token=token))
+    else:
+        return redirect(url_for("custom_err", code=403))
+
+@rest.post("/pubload/<token>")
+def token_create(token):
+    cfg = load_config(YAML_CFG_PATH)
+    if token in cfg["upload_tokens"]:
+        target_dir = cfg["upload_tokens"][token]["target"]
+        # uploading some file
+        app.config["UPLOADS_FILES_DEST"] = filedb.get_path(target_dir)
+        req_file = request.files.get("target")
+        filename = filedb.create_file(target_dir, req_file)
+        return jsonify({
+          "msg": f"uploaded file: {os.path.basename(filename)}",
+          "state": "ok",
+        })
+    return redirect(url_for("custom_err", code=404))
 
 #@app.route("/zones")
 #@app.route("/zones/<zone>/add")

@@ -24,13 +24,15 @@ MyCtrlField.prototype = new jsGrid.Field({
 			["confirm", "check"],      ["cancel",  "close"]
 		];
 		if (this.grid_id == "dirs")
-			//ctrl_items.push(...[[null, null], [null, null]]);
-		{}
+		  ctrl_items.push(...[
+				["upload_token", "upload"]
+			]);
+
 		else
 			ctrl_items.push(...[
 				["edit", "pencil"],
 				["preview", "magnify"],
-				["public", "earth"]
+				["public", "earth"],
 			]);
 
 		var htmls = ctrl_items.map((data, idx) =>

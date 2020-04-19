@@ -3,31 +3,33 @@
 	<meta charset="UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-	<title>Fancy Uploader Frontend</title>
+	<title>File Uploader</title>
 
 	<script src="{{ url_for("get_static", target="jquery-3.4.1.min.js") }}"
 		type="text/javascript" charset="utf-8"></script>
 	<script src="{{ url_for("get_static", target="jquery.form.js") }}"
 		type="text/javascript" charset="utf-8"></script>
-	<script src="{{ url_for("get_static", target="jsgrid/dist/jsgrid.min.js") }}"
+	<!--script src="{{ url_for("get_static", target="jsgrid/dist/jsgrid.min.js") }}"
 		type="text/javascript" charset="utf-8"></script>
 	<script src="{{ url_for("get_static", target="ace/src-min/ace.js") }}"
-		type="text/javascript" charset="utf-8"></script>
+		type="text/javascript" charset="utf-8"></script/-->
 
-	<link rel="stylesheet" href="{{ url_for("get_static",
-											target="jsgrid/dist/jsgrid-theme.min.css") }}" />
-	<link rel="stylesheet" href="{{ url_for("get_static",
-											target="jsgrid/dist/jsgrid.min.css") }}" />
+	<!--link rel="stylesheet" href="{{ url_for("get_static",
+											target="jsgrid/dist/jsgrid-theme.min.css") }}" /-->
+	<!--link rel="stylesheet" href="{{ url_for("get_static",
+											target="jsgrid/dist/jsgrid.min.css") }}" /-->
 	<link rel="stylesheet" href="{{ url_for("get_static",
 											target="style.css") }}" />
 
-	<script src="{{ url_for("get_static", target="main.js") }}"
-		type="text/javascript" charset="utf-8"></script>
+
+
+	<!--script src="{{ url_for("get_static", target="main.js") }}"
+		type="text/javascript" charset="utf-8"></script /-->
 
 </head>
 <script>
 
-	var url_prefix = "{{ url_prefix }}";
+	/*var url_prefix = "{{ url_prefix }}";
 
 	var current_dir = "{{ base_dir }}";
 	// hack, @fixme
@@ -48,17 +50,17 @@
 	{% else %}
 	var editor_target = null;
 	{% endif %}
-
+*/
 </script>
 
 <body>
 
 
-<div id="previewbox"><img></img></div>
-
 <article>
 	<div id=flash class=toplvlbox></div>
 </article>
+<!--div id="previewbox"><img></img></div>
+
 <article>
 	<div id=curpath class=toplvlbox></div>
 </article>
@@ -70,11 +72,9 @@
 			<div id=editor_ctrl class=sublvlbox>
 				<form method=POST name=editor
 						  action="{{ url_for('create', dirname=base_dir) }}">
-					<!-- input type=image src="{{ url_for('get_icon', icon='format-clear') }}" name=clear value=clear /-->
 					<input type=image src="{{ url_for('get_icon', icon='content-save') }}" name=what value=save />
 					<input type=image src="{{ url_for('get_icon', icon='window-close') }}" name=close value=close />
 					<label class=unchanged></label>
-					<!-- input type=image src="{{ url_for('get_icon', icon='copy') }}" name=copyurl value=copy-url /-->
 					<input type=hidden name=filename />
 		  		<input type=hidden name=data />
 				</form>
@@ -89,21 +89,21 @@
 	<article>
 		<div id=dirs class=toplvlbox></div>
 		<div id=files class=toplvlbox></div>
-	</article>
+	</article-->
 
 	<article>
-			<div id=newdir class=toplvlbox>
+			<!--div id=newdir class=toplvlbox>
 			  <form method=POST action="{{ url_for("create", dirname=base_dir) }}"
 			  			name=newdir>
 				  <label>new directory:</label>
 				  <input type=text name=new_dirname value=""/>
 				  <input type=submit value=create name=what />
 			  </form>
-		  </div>
+		  </div-->
 
  		  <div id=upload class=toplvlbox>
  			  <form method=POST enctype=multipart/form-data
-							action="{{ url_for("create", dirname=base_dir) }}" name=upload>
+  						action="{{ action }}" name=upload>
 				  <label>upload file:</label>
 				  <input type=file name=target />
 					<input type=hidden name=what value=upload />
@@ -116,8 +116,8 @@
 
 </main>
 
-<script src="{{ url_for("get_static", target="end.js") }}"
-	type="text/javascript" charset="utf-8"></script>
+<!--script src="{{ url_for("get_static", target="end.js") }}"
+	type="text/javascript" charset="utf-8"></script-->
 
 </body>
 
