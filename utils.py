@@ -27,8 +27,6 @@ class PathLocker:
 def load_config(config_path):
     """load config in given 'fconfig_path', on any error fail critical & exit!"""
 
-    print("load config")
-
     if not os.path.exists(config_path):
         print("config path: {config_path} not found, exiting...")
         sys.exit(1)
@@ -85,7 +83,6 @@ def load_config(config_path):
 
 def save_config(cfg, config_path):
 
-    print ("save config")
 
     cfg.setdefault("upload_tokens", {})
     cfg.setdefault("zones", {"pub": {}})
