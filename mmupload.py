@@ -311,6 +311,7 @@ def new_upload_token(dirname):
     uuid = create_uid()
     token = hf(uuid.bytes).hexdigest()
 
+    cfg = load_config(YAML_CFG_PATH)
     cfg.setdefault("upload_tokens", {})[token] = {
         "target": dirname,
         "created": dt.now()
