@@ -14,12 +14,14 @@ class PathLocker:
         self.fp = None
 
     def __enter__ (self):
-        if not os.path.exists(self.path_to_lock):
+        if os.path.exists(self.path_to_lock):
+            print(f"locking {self.path_to_lock}")
             self.fp = open(self.path_to_lock, "rb")
             fcntl.flock(self.fp.fileno(), fcntl.LOCK_EX)
 
     def __exit__ (self, _type, value, tb):
         if self.fp:
+            print(f"unlocking {self.path_to_lock}")
             fcntl.flock(self.fp.fileno(), fcntl.LOCK_UN)
             self.fp.close()
 
