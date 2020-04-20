@@ -16,6 +16,7 @@
 	--bg-icon:       #A04010;
 	--bg-icon-alt:   #469600;
 	--bg-icon-hover: #ABABAB;
+
 	--bg-icon-good:  #469600;
 	--bg-icon-bad:   #A04010;
 
@@ -24,13 +25,35 @@
 
 }
 
-/*:root {
-	--bg-color: #282828;
-	--fg-color: #0C0032;
-	--border-color: #190061;
-	--bg-color-odd: #240090;
-	--bg-color-even: #3500D3;
+/*
+:root {
+    --bg-color: #3500d3;
+    --bg-color-alt: #240090;
+    
+		--fg-color: #454552;
+    --fg-color-hover: #a5a5a2;
+    
+		--border-color: #7A7A7A;
+    
+		--border-color-alt: #BABABA;
+    --border-color-row: #9A9A9A;
+    --border-color-icon: #7A7A7A;
+    
+		--extra-color: #190061;
+    --bg-icon: #A04010;
+    
+		--bg-icon-alt: #469600;
+    --bg-icon-hover: #ABABAB;
+
+    --bg-icon-good: #469600;
+    --bg-icon-bad: #A04010;
+
+    --bg-msg-info: #38805d6e;
+    --bg-msg-err: #ed5f5f80;
+
+		--bg-iconbox: #9a9a9a;
 }*/
+
 
 
 body {
@@ -89,6 +112,7 @@ label {
 	padding: 0;
 	margin: 0;
 	vertical-alignment: middle;
+	backgrou-color: var(--bg-icon-box)
 }
 
 .iconbox img { }
@@ -225,7 +249,8 @@ article {
 		vertical-align: top;
 	}
 	#dirs, #files {
-		height: 30vh !important;
+		/*height: 80vh !important;*/
+		height: 80vh !important;
 	}
 	#flash {
 		background-color: var(--bg-color);;
