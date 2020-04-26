@@ -185,7 +185,7 @@ $(function() {
 	editor = ace.edit("editor");
 	//editor.setTheme("ace/theme/twilight");
 	//editor.setTheme("ace/theme/terminal");
-	editor.setTheme("ace/theme/IPlastic");
+	editor.setTheme("ace/theme/iplastic");
 	//editor.session.setMode("ace/mode/javascript");
 
 	editor.on("change", function(ev) {
