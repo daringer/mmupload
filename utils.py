@@ -14,6 +14,7 @@ class PathLocker:
         self.fp = None
 
     def __enter__ (self):
+        return
         if os.path.exists(self.path_to_lock):
             #print(f"locking {self.path_to_lock}")
             self.fp = open(self.path_to_lock, "rb")
