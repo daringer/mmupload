@@ -22,6 +22,8 @@
 											target="style.css") }}" />
 
 
+	<script src="{{ url_for("get_static", target="messages.js") }}"
+		type="text/javascript" charset="utf-8"></script>
 
 	<!--script src="{{ url_for("get_static", target="main.js") }}"
 		type="text/javascript" charset="utf-8"></script /-->
@@ -29,14 +31,14 @@
 </head>
 <script>
 
-	/*var url_prefix = "{{ url_prefix }}";
+	var url_prefix = "{{ url_prefix }}";
 
 	var current_dir = "{{ base_dir }}";
 	// hack, @fixme
 	if (current_dir == ".")
 			current_dir = "";
 
-	{% for msg in messages %}
+	/*{% for msg in messages %}
 		show_message("{{msg}}");
 	{% endfor %}
 
@@ -81,11 +83,23 @@
 <!--script src="{{ url_for("get_static", target="end.js") }}"
 	type="text/javascript" charset="utf-8"></script-->
 
-	<script type="text/javascript">
+<script type="text/javascript" charset="utf-8">
 
 	$(function() {
-  		
-	}
+
+		$("#upload").ajaxForm(function(ret) {
+
+				if (ret.state == "fail") {
+					ret.msgs.forEach((msg) => show_error(msg));
+				} else {
+					show_message("file uploaded successfully");
+					//update_grid("files", current_dir);
+				}
+				// clear upload file name field
+				$("form[name=upload] input[type=file]").val("");
+		});
+
+	});
 	</script>
 
 </body>
