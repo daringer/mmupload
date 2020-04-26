@@ -100,10 +100,10 @@ label {
 }
 
 .changed {
-	color: var(--bg-msg-info);
+	color: var(--bg-msg-err);
 }
 .unchanged {
-	color: var(--bg-msg-err);
+	color: var(--bg-msg-info);
 }
 
 
@@ -179,8 +179,8 @@ a.uniquelink {
 
 #editor_ctrl {
 	border: 0;
-	background-color: black;
-	color: var(--bg-color-alt);
+	background-color: var(--bg-color);
+	color: var(--fg-color);
 	margin-left: 0;
 	padding-left: 3em;
 	padding-top: 1em;
