@@ -35,7 +35,7 @@ MyCtrlField.prototype = new jsGrid.Field({
 				["public", "earth"],
 			]);
 
-		ctrl_items.push(["info", "information-outline"]);
+		//ctrl_items.push(["info", "information-outline"]);
 
 		var htmls = ctrl_items.map((data, idx) =>
 			"<div class=iconbox id='iconbox_" + item.uid + "_" + data[0] +
