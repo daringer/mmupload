@@ -55,6 +55,26 @@
 }*/
 
 
+/*
+table { }
+tr,td {   padding: 10px; }
+tr {
+  box-shadow: 0px 2px 4px rgba(0.4, 0.9, 0.8, 0.15);
+  background-color: #cbcbcb4c; 
+}
+tr.spacer {
+  height: 10px;
+  border:0;
+  margin:0;
+  padding:0;
+  box-shadow: 0px 0px 0px rgba(1,1,1,1);
+  background-color: unset;
+}
+tr:hover {    background-color: #ccc; }
+*/
+
+
+
 
 body {
 	background-color: var(--bg-color);
