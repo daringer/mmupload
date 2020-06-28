@@ -18,7 +18,7 @@ from uuid import uuid4 as create_uid
 
 import yaml
 
-from mmpy.flask_simple_rest import FlaskSimpleRest, get_rest_decorator
+from mmpy import FlaskAutoRoute, get_route_decorator
 
 from file_db import FileDB, FileDBError
 from utils import load_config, save_config
@@ -42,7 +42,7 @@ app.register_blueprint(main, url_prefix="/")
 
 filedb = FileDB(cfg["file_destination"], YAML_CFG_PATH)
 
-rest = get_rest_decorator(app)
+web = get_route_decorator(app)
 
 ####
 #### utils
@@ -114,12 +114,12 @@ def no_auth(f):
 #### endpoints
 ####
 
-@app.route("/logout")
+@web.get("/logout")
 def http_logout():
     return http_authenticate()
 
 
-@app.route("/local/<path:target>")
+@web.get("/local/<path:target>")
 #@requires_auth
 def get_static(target=""):
     if ".." in target:
@@ -134,7 +134,7 @@ def get_static(target=""):
 
 ICON_CACHE = {}
 
-@app.route("/local/icon/<string:icon>")
+@web.get("/local/icon/<string:icon>")
 def get_icon(icon):
     if ".." in icon:
         return;
@@ -149,16 +149,16 @@ def get_icon(icon):
 
     return Response(data, mimetype=mtype)
 
-@app.route("/")
-@app.route("/dir/")
-@app.route("/dir/<path:dirname>")
+@web.get("/")
+@web.get("/dir/")
+@web.get("/dir/<path:dirname>")
 @requires_auth
 def show(dirname=""):
     #return render_page(dirname, msgs=[request.args.get("msg")])
     #print (list(request.args), request.args.get("msg"))
     return render_page(dirname, msgs=[request.args.get("msg")])
 
-@app.route("/err/<int:code>")
+@web.get("/err/<int:code>")
 def custom_err(code):
    desc = {
      404: "Not Found",
@@ -167,8 +167,8 @@ def custom_err(code):
    return render_template("custom_err.html", err_code=code, err_desc=desc)
 
 
-@rest.post("/new/")
-@rest.post("/new/<path:dirname>")
+@web.post("/new/")
+@web.post("/new/<path:dirname>")
 @requires_auth
 def create(dirname=""):
     state = "ok"
@@ -209,8 +209,8 @@ def create(dirname=""):
         state = "fail"
     return jsonify({"dirname": dirname, "msgs": [msg], "state": state})
 
-@rest.get("/list/<string:what>/")
-@rest.get("/list/<string:what>/<path:dirname>")
+@web.get("/list/<string:what>/")
+@web.get("/list/<string:what>/<path:dirname>")
 @requires_auth
 def ls(what, dirname=""):
     raw_list = map(lambda p: {
@@ -240,12 +240,12 @@ def ls(what, dirname=""):
     data = {"data": data, "upload_url": url_for("create", dirname=dirname)}
     return jsonify(data)
 
-@rest.get("/edit/<path:target>")
+@web.get("/edit/<path:target>")
 @requires_auth
 def edit(target):
     return render_page(dirname=os.path.dirname(target), editor_target=target)
 
-@rest.post("/move/<path:target>")
+@web.post("/move/<path:target>")
 @requires_auth
 def move(target):
     old_parent = os.path.dirname(target)
@@ -258,13 +258,13 @@ def move(target):
 
     return jsonify({"msg": f"'{target}' moved to '{new_target}'", "state": "ok"})
 
-@rest.get("/meta/<path:target>")
+@web.get("/meta/<path:target>")
 @requires_auth
 def show_meta(target):
     meta = filedb.get_meta_from_yaml(target)
     return jsonify({"state": "ok", "meta": meta})
 
-@rest.post("/meta/<path:target>/del/<key>")
+@web.post("/meta/<path:target>/del/<key>")
 @requires_auth
 def del_meta_property(target, key):
     meta = filedb.load_path_meta(target)
@@ -276,7 +276,7 @@ def del_meta_property(target, key):
 
     return jsonify({"state": "fail", "msg": f"meta key not found: {key}"})
 
-@rest.post("/meta/<path:target>/set/<key>/<value_type>/<value>")
+@web.post("/meta/<path:target>/set/<key>/<value_type>/<value>")
 @requires_auth
 def set_meta_property(target, key, value_type, value=None):
     if value_type in ["string", "path"]:
@@ -302,13 +302,13 @@ def set_meta_property(target, key, value_type, value=None):
 
     return jsonify(dct)
 
-@rest.get("/meta/<path:target>/get/<key>")
+@web.get("/meta/<path:target>/get/<key>")
 @requires_auth
 def get_meta_property(target, key):
     meta = filedb.load_path_meta(target)
     return jsonify({"state": "ok", "target": target, "meta": meta})
 
-@rest.post("/token/upload/<path:dirname>")
+@web.post("/token/upload/<path:dirname>")
 @requires_auth
 def new_upload_token(dirname):
     hf = hashlib.sha3_224
@@ -325,7 +325,7 @@ def new_upload_token(dirname):
     return jsonify({"state": "ok", "msg": f"token ({token}) created successfully",
                     "link": link_path, "token": token })
 
-@rest.get("/token/upload/")
+@web.get("/token/upload/")
 @requires_auth
 def list_tokens():
     cfg = load_config(YAML_CFG_PATH)
@@ -335,7 +335,7 @@ def list_tokens():
         "upload_tokens": cfg["upload_tokens"]
     })
 
-@rest.get("/pubload/<token>")
+@web.get("/pubload/<token>")
 def use_token(token):
     cfg = load_config(YAML_CFG_PATH)
     if token in cfg["upload_tokens"]:
@@ -345,7 +345,7 @@ def use_token(token):
     else:
         return redirect(url_for("custom_err", code=403))
 
-@rest.post("/pubload/<token>")
+@web.post("/pubload/<token>")
 def token_create(token):
     cfg = load_config(YAML_CFG_PATH)
     if token in cfg["upload_tokens"]:
@@ -364,7 +364,7 @@ def token_create(token):
 #@app.route("/zones/<zone>/edit")
 #@app.route("/zones/<zone>/del")
 
-@rest.post("/del/<path:target>")
+@web.post("/del/<path:target>")
 @requires_auth
 def delete(target):
     try:
@@ -378,14 +378,14 @@ def delete(target):
         return jsonify({"msg": repr(e), "state": "fail"})
     return jsonify({"msg": f"'{target}' deleted", "state": "ok"})
 
-@rest.get("/get/download/<path:target>")
+@web.get("/get/download/<path:target>")
 def get_file(target):
     auth_wrap = no_auth if filedb.is_path_public(target) else requires_auth
     def _get():
         return _file_get_helper(target)
     return auth_wrap(_get)()
 
-@rest.get("/get/raw/<path:target>")
+@web.get("/get/raw/<path:target>")
 def get_raw_file(target):
     auth_wrap = no_auth if filedb.is_path_public(target) else requires_auth
     def _get():
@@ -397,7 +397,7 @@ def get_raw_file(target):
                  repr(e)[:50]] })
     return auth_wrap(_get)()
 
-@rest.get("/get/<path:target>")
+@web.get("/get/<path:target>")
 def get_file_short(target):
     return get_file(target)
 
