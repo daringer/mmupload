@@ -1,27 +1,31 @@
 
 :root {
-	--bg-color:       #C4C4C5;
-	--bg-color-alt:   #BABABA;
+	--bg-color:          #C4C4C5;
+	--bg-color-alt:      #BABABA;
 
-	--fg-color:       #454552;
-	--fg-color-hover: #353542;
+	--fg-color:          #454552;
+	--fg-color-hover:    #353542;
 
-	--border-color:     #7A7A7A;
-	--border-color-alt: #BABABA;
-  --border-color-row: #9A9A9A;
-	--border-color-icon:   #7A7A7A;
+	--border-color:      #7A7A7A;
+	--border-color-alt:  #BABABA;
+    --border-color-row:  #9A9A9A;
+	--border-color-icon: #7A7A7A;
 
-	--extra-color:    #F8F8F8;
+	--extra-color:       #F8F8F8;
 
-	--bg-icon:       #A04010;
-	--bg-icon-alt:   #469600;
-	--bg-icon-hover: #ABABAB;
+	--bg-icon:           #A04010;
+	--bg-icon-alt:       #469600;
+	--bg-icon-hover:     #ABABAB;
 
-	--bg-icon-good:  #469600;
-	--bg-icon-bad:   #A04010;
+	--bg-icon-good:      #469600;
+	--bg-icon-bad:       #A04010;
 
-	--bg-msg-info:   #38805d6e;
-	--bg-msg-err:    #ed5f5f80;
+	--bg-msg-info:       #38805d6e;
+	--bg-msg-err:        #ed5f5f80;
+
+    --bg-row-hover:      #475e9f38;
+
+	/*--bg-msg-err:        #ed5f5f80;*/
 
 }
 
@@ -416,9 +420,18 @@ br {
 }
 
 
+/*.jsgrid-cell, .jsgrid-alt-row>.jsgrid-cell, .jsgrid-row, .jsgrid-alt-row {
+    background-color: unset !important;
+}
 
+.jsgrid-row>.jsgrid-cell:hover {
+    background-color: #000;
+}
 
-
+.jsgrid-selected-row {
+    background-color: unset !important;
+    color: #00ff00;
+}*/
 
 @media only screen and (max-width: 1279px) {
 	#files, #dirs, #curpath, #editorbox, #newdir, #upload {
@@ -448,38 +461,34 @@ br {
 		line-height: 0.9em;
 	}
 	.jsgrid-cell {
-    	padding: .25em;
+    	    padding: .25em;
 			padding-top: 1.5em;
 			padding-bottom: 1.5em;
 	}
 	body {
 		font-size: 1.0em;
 	}
-
 }
 
 
+/**** FINALLY ROW HOVER                                  ****/
+/* magic chrome inspect -> right:click -> copy -> selector */
 
+#dirs > div.jsgrid-grid-body > table > tbody > tr > td,
+#files > div.jsgrid-grid-body > table > tbody > tr > td {
+    background-color: inherit;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+#dirs > div.jsgrid-grid-body > table > tbody > tr:hover,
+#files > div.jsgrid-grid-body > table > tbody > tr:hover {
+    background-color: var(--bg-row-hover);
+}
 
 
 
 /* PLAYGROUND */
 
-
+/*
 .topink {
 	filter: brightness(0.5) sepia(1) hue-rotate(-70deg) saturate(5);
 }
@@ -490,6 +499,6 @@ br {
 	filter: brightness(0.5) sepia(1) hue-rotate(140deg) saturate(6);
 }
 
-
+*/
 
 
